@@ -46,7 +46,7 @@
         public string EventTitle { get; set; } = string.Empty;
         public string UserName { get; set; } = string.Empty;
         public DateTime RegisteredAt { get; set; }
-        public EventViewModel Event { get; set; }
+        public EventViewModel Event { get; set; } = new();
     }
 
     public class AuthResponse
