@@ -1,31 +1,23 @@
-using System.Diagnostics;
+using KMC.Client.Services;
 using Microsoft.AspNetCore.Mvc;
-using KMC.Client.Models;
 
-namespace KMC.Client.Controllers;
-
-public class HomeController : Controller
+namespace KMC.Client.Controllers
 {
-    private readonly ILogger<HomeController> _logger;
-
-    public HomeController(ILogger<HomeController> logger)
+    public class HomeController : Controller
     {
-        _logger = logger;
-    }
+        private readonly ApiService _api;
 
-    public IActionResult Index()
-    {
-        return View();
-    }
+        public HomeController(ApiService api) => _api = api;
 
-    public IActionResult Privacy()
-    {
-        return View();
-    }
+        public async Task<IActionResult> Index(string? category, DateTime? date, string? location)
+        {
+            // Save search filters to ViewBag so the form remembers what the user typed
+            ViewBag.Category = category;
+            ViewBag.Date = date?.ToString("yyyy-MM-dd");
+            ViewBag.Location = location;
 
-    [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
-    public IActionResult Error()
-    {
-        return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+            var events = await _api.GetEventsAsync(category, date, location);
+            return View(events);
+        }
     }
 }
