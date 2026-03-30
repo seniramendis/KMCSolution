@@ -41,6 +41,8 @@ namespace KMC.Client.Controllers
             if (!ModelState.IsValid) return View(model);
 
             var response = await _api.RegisterAsync(model);
+
+            // If the API gives us a successful response, redirect to Login
             if (response != null)
             {
                 TempData["Message"] = "Registration successful! Please log in.";

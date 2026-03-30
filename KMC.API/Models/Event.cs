@@ -18,5 +18,6 @@ namespace KMC.API.Models
         public int Capacity { get; set; }
 
         public int OrganizerId { get; set; }
+        public string ImageUrl { get; set; } = string.Empty;
     }
 }

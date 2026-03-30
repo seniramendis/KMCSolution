@@ -85,11 +85,36 @@ namespace KMC.Client.Controllers
             return RedirectToAction("MyRegistrations");
         }
 
+        [HttpGet]
+        public async Task<IActionResult> Attendees(int id)
+        {
+            var attendees = await _api.GetEventAttendeesAsync(id);
+            return View(attendees); // Pass the list to the HTML page
+        }
+
         public async Task<IActionResult> MyRegistrations()
         {
             if (string.IsNullOrEmpty(HttpContext.Session.GetString("JwtToken"))) return RedirectToAction("Login", "Auth");
             var list = await _api.GetMyRegistrationsAsync();
             return View(list);
+        }
+
+        // GET: api/Event/5/attendees
+        [HttpGet("{eventId}/attendees")]
+        public async Task<IActionResult> GetAttendees(int eventId)
+        {
+            // Search the Registrations table for anyone matching this EventId
+            var attendees = await _context.Registrations
+                .Where(r => r.EventId == eventId)
+                .Select(r => new
+                {
+                    FullName = r.User.FullName,
+                    Email = r.User.Email,
+                    RegistrationDate = r.RegistrationDate
+                })
+                .ToListAsync();
+
+            return Ok(attendees);
         }
     }
 }

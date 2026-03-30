@@ -10,6 +10,7 @@ using KMC.Client.Models;
 
 namespace KMC.Client.Services
 {
+
     public class ApiService
     {
         private readonly HttpClient _http;
@@ -27,8 +28,24 @@ namespace KMC.Client.Services
             => await PostAsync<AuthResponse>("api/auth/login", model);
 
         public async Task<AuthResponse?> RegisterAsync(RegisterViewModel model)
-            => await PostAsync<AuthResponse>("api/auth/register", model);
+        {
+            try
+            {
+                var content = new StringContent(System.Text.Json.JsonSerializer.Serialize(model), System.Text.Encoding.UTF8, "application/json");
+                var res = await _http.PostAsync("api/Auth/register", content);
 
+                if (res.IsSuccessStatusCode)
+                {
+                    return new AuthResponse { Token = "Success" };
+                }
+
+                return null;
+            }
+            catch
+            {
+                return null;
+            }
+        }
         // --- Events ---
         public async Task<List<EventViewModel>> GetEventsAsync(string? category = null, DateTime? date = null, string? location = null)
         {
@@ -110,5 +127,29 @@ namespace KMC.Client.Services
             var q = string.Join("&", parts);
             return string.IsNullOrEmpty(q) ? "" : "?" + q;
         }
+        public async Task<List<AttendeeViewModel>> GetEventAttendeesAsync(int eventId)
+        {
+            try
+            {
+                var res = await _http.GetAsync($"api/Event/{eventId}/attendees");
+                if (res.IsSuccessStatusCode)
+                {
+                    var content = await res.Content.ReadAsStringAsync();
+                    return System.Text.Json.JsonSerializer.Deserialize<List<AttendeeViewModel>>(content,
+                        new System.Text.Json.JsonSerializerOptions { PropertyNameCaseInsensitive = true })!;
+                }
+                return new List<AttendeeViewModel>();
+            }
+            catch
+            {
+                return new List<AttendeeViewModel>();
+            }
+        }
+    }
+    public class AttendeeViewModel
+    {
+        public string FullName { get; set; } = string.Empty;
+        public string Email { get; set; } = string.Empty;
+        public DateTime RegistrationDate { get; set; }
     }
 }
