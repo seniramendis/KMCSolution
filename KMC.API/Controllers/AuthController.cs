@@ -24,7 +24,7 @@ namespace KMC.API.Controllers
         }
 
         // DTOs to catch the incoming JSON from your Client
-        public class RegisterDto { public string FullName { get; set; } = string.Empty; public string Email { get; set; } = string.Empty; public string Password { get; set; } = string.Empty; public string Role { get; set; } = string.Empty; }
+        public class RegisterDto { public string FullName { get; set; } = string.Empty; public string Email { get; set; } = string.Empty; public string Password { get; set; } = string.Empty; public string? Role { get; set; } }
         public class LoginDto { public string Email { get; set; } = string.Empty; public string Password { get; set; } = string.Empty; }
 
         [HttpPost("register")]

@@ -7,6 +7,7 @@ using System.Text;
 using System.Text.Json;
 using Microsoft.AspNetCore.Http;
 using KMC.Client.Models;
+using System.Net.Http.Json;
 
 namespace KMC.Client.Services
 {
@@ -25,25 +26,44 @@ namespace KMC.Client.Services
 
         // --- Auth ---
         public async Task<AuthResponse?> LoginAsync(LoginViewModel model)
-            => await PostAsync<AuthResponse>("api/auth/login", model);
-
-        public async Task<AuthResponse?> RegisterAsync(RegisterViewModel model)
         {
             try
             {
-                var content = new StringContent(System.Text.Json.JsonSerializer.Serialize(model), System.Text.Encoding.UTF8, "application/json");
-                var res = await _http.PostAsync("api/Auth/register", content);
+                // The absolute bulletproof way to send JSON to an API
+                var res = await _http.PostAsJsonAsync("api/Auth/login", model);
 
                 if (res.IsSuccessStatusCode)
                 {
                     return new AuthResponse { Token = "Success" };
                 }
 
-                return null;
+                var errorMsg = await res.Content.ReadAsStringAsync();
+                throw new Exception($"API Rejected: {errorMsg}");
             }
-            catch
+            catch (HttpRequestException)
             {
-                return null;
+                throw new Exception("CONNECTION ERROR: Cannot reach the API. Are both projects running?");
+            }
+        }
+
+        public async Task<AuthResponse?> RegisterAsync(RegisterViewModel model)
+        {
+            try
+            {
+                // The absolute bulletproof way to send JSON to an API
+                var res = await _http.PostAsJsonAsync("api/Auth/register", model);
+
+                if (res.IsSuccessStatusCode)
+                {
+                    return new AuthResponse { Token = "Success" };
+                }
+
+                var errorMsg = await res.Content.ReadAsStringAsync();
+                throw new Exception($"API Rejected: {errorMsg}");
+            }
+            catch (HttpRequestException)
+            {
+                throw new Exception("CONNECTION ERROR: Cannot reach the API. Are both projects running?");
             }
         }
         // --- Events ---

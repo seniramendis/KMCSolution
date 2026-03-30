@@ -24,19 +24,19 @@
                 </tr>
             </thead>
             <tbody>
-                @foreach (var ev in Model)
+                @foreach (var eventItem in Model)
                 {
                     <tr>
-                        <td><strong>@ev.Title</strong></td>
-                        <td>@ev.EventDate.ToString("MMM dd, yyyy HH:mm")</td>
-                        <td><span class="badge bg-secondary">@ev.Category</span></td>
-                        <td>@ev.RegisteredCount / @ev.Capacity</td>
+                        <td><strong>@eventItem.Title</strong></td>
+                        <td>@eventItem.EventDate.ToString("MMM dd, yyyy HH:mm")</td>
+                        <td><span class="badge bg-secondary">@eventItem.Category</span></td>
+                        <td>@eventItem.RegisteredCount / @eventItem.Capacity</td>
                         <td>
-                            <a asp-action="Details" asp-route-id="@ev.Id" class="btn btn-sm btn-info text-white">View</a>
-                            <form asp-action="Delete" asp-route-id="@ev.Id" method="post" style="display:inline;" onsubmit="return confirm('Delete this event?');">
+                            <a asp-action="Details" asp-route-id="@eventItem.Id" class="btn btn-sm btn-info text-white">View</a>
+                            <form asp-action="Delete" asp-route-id="@eventItem.Id" method="post" style="display:inline;" onsubmit="return confirm('Delete this event?');">
                                 <button type="submit" class="btn btn-sm btn-danger">Delete</button>
-                                <a href="/Event/Attendees/@eventItem.EventId" class="btn btn-primary">View Attendees</a>
                             </form>
+                            <a href="/Event/Attendees/@eventItem.Id" class="btn btn-primary">View Attendees</a>
                         </td>
                     </tr>
                 }
