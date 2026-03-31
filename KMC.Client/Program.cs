@@ -17,7 +17,7 @@ builder.Services.AddSession(options =>
 builder.Services.AddHttpClient<ApiService>(client =>
 {
     // Make sure this port matches your KMC.API launchSettings.json!
-    client.BaseAddress = new Uri("https://localhost:7166/");
+    client.BaseAddress = new Uri("http://localhost:5085/");
 });
 
 var app = builder.Build();

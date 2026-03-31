@@ -28,6 +28,15 @@
         </div>
     </form>
 
+    @if (!string.IsNullOrEmpty(ViewBag.ErrorMessage))
+    {
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <strong>Connection Error</strong>
+            <p>@ViewBag.ErrorMessage</p>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
     <h2 class="mb-4">Upcoming Events</h2>
 
     @if (Model == null || !Model.Any())

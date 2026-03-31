@@ -40,17 +40,37 @@ namespace KMC.Client.Controllers
         {
             if (!ModelState.IsValid) return View(model);
 
-            var response = await _api.RegisterAsync(model);
-
-            // If the API gives us a successful response, redirect to Login
-            if (response != null)
+            try
             {
-                TempData["Message"] = "Registration successful! Please log in.";
+                // 1. Register the new account
+                var response = await _api.RegisterAsync(model);
+
+                // 2. AUTO-LOGIN: Immediately log them in using the exact details they just typed
+                var loginResponse = await _api.LoginAsync(new LoginViewModel
+                {
+                    Email = model.Email,
+                    Password = model.Password
+                });
+
+                // 3. Save their digital passport
+                if (loginResponse != null && !string.IsNullOrEmpty(loginResponse.Token))
+                {
+                    HttpContext.Session.SetString("JwtToken", loginResponse.Token);
+                    HttpContext.Session.SetString("FullName", loginResponse.FullName ?? "");
+                    HttpContext.Session.SetString("Role", loginResponse.Role ?? "");
+
+                    // 4. TELEPORT them straight to the Dashboard!
+                    return RedirectToAction("Index", "Home");
+                }
+
                 return RedirectToAction("Login");
             }
-
-            ViewBag.Error = "Registration failed. Email might be in use.";
-            return View(model);
+            catch (Exception ex)
+            {
+                // If it fails, print the exact error on the screen
+                ViewBag.Error = ex.Message;
+                return View(model);
+            }
         }
 
         [HttpGet]

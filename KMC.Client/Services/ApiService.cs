@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Http;
 using KMC.Client.Models;
 using System.Net.Http.Json;
 
+
 namespace KMC.Client.Services
 {
 
@@ -29,12 +30,12 @@ namespace KMC.Client.Services
         {
             try
             {
-                // The absolute bulletproof way to send JSON to an API
                 var res = await _http.PostAsJsonAsync("api/Auth/login", model);
 
                 if (res.IsSuccessStatusCode)
                 {
-                    return new AuthResponse { Token = "Success" };
+                    var content = await res.Content.ReadAsStringAsync();
+                    return JsonSerializer.Deserialize<AuthResponse>(content, _json);
                 }
 
                 var errorMsg = await res.Content.ReadAsStringAsync();
@@ -50,16 +51,16 @@ namespace KMC.Client.Services
         {
             try
             {
-                // The absolute bulletproof way to send JSON to an API
                 var res = await _http.PostAsJsonAsync("api/Auth/register", model);
 
                 if (res.IsSuccessStatusCode)
                 {
-                    return new AuthResponse { Token = "Success" };
+                    var content = await res.Content.ReadAsStringAsync();
+                    return JsonSerializer.Deserialize<AuthResponse>(content, _json);
                 }
 
                 var errorMsg = await res.Content.ReadAsStringAsync();
-                throw new Exception($"API Rejected: {errorMsg}");
+                throw new Exception(errorMsg);
             }
             catch (HttpRequestException)
             {
@@ -69,47 +70,125 @@ namespace KMC.Client.Services
         // --- Events ---
         public async Task<List<EventViewModel>> GetEventsAsync(string? category = null, DateTime? date = null, string? location = null)
         {
-            var query = BuildQuery(new Dictionary<string, string?> { ["category"] = category, ["date"] = date?.ToString("yyyy-MM-dd"), ["location"] = location });
-            return await GetAsync<List<EventViewModel>>($"api/events{query}") ?? new();
+            try
+            {
+                var query = BuildQuery(new Dictionary<string, string?> { ["category"] = category, ["date"] = date?.ToString("yyyy-MM-dd"), ["location"] = location });
+                return await GetAsync<List<EventViewModel>>($"api/events{query}") ?? new();
+            }
+            catch (HttpRequestException)
+            {
+                throw new Exception("CONNECTION ERROR: Cannot reach the API. Are both projects running?");
+            }
         }
 
-        public async Task<EventViewModel?> GetEventAsync(int id) => await GetAsync<EventViewModel>($"api/events/{id}");
+        public async Task<EventViewModel?> GetEventAsync(int id)
+        {
+            try
+            {
+                return await GetAsync<EventViewModel>($"api/events/{id}");
+            }
+            catch (HttpRequestException)
+            {
+                throw new Exception("CONNECTION ERROR: Cannot reach the API. Are both projects running?");
+            }
+        }
 
-        public async Task<EventViewModel?> CreateEventAsync(CreateEventViewModel model) => await PostAsync<EventViewModel>("api/events", model, true);
+        public async Task<EventViewModel?> CreateEventAsync(CreateEventViewModel model)
+        {
+            try
+            {
+                return await PostAsync<EventViewModel>("api/events", model, true);
+            }
+            catch (HttpRequestException)
+            {
+                throw new Exception("CONNECTION ERROR: Cannot reach the API. Are both projects running?");
+            }
+        }
 
-        public async Task<EventViewModel?> UpdateEventAsync(int id, CreateEventViewModel model) => await PutAsync<EventViewModel>($"api/events/{id}", model, true);
+        public async Task<EventViewModel?> UpdateEventAsync(int id, CreateEventViewModel model)
+        {
+            try
+            {
+                return await PutAsync<EventViewModel>($"api/events/{id}", model, true);
+            }
+            catch (HttpRequestException)
+            {
+                throw new Exception("CONNECTION ERROR: Cannot reach the API. Are both projects running?");
+            }
+        }
 
         public async Task<bool> DeleteEventAsync(int id)
         {
-            AttachToken();
-            var res = await _http.DeleteAsync($"api/events/{id}");
-            return res.IsSuccessStatusCode;
+            try
+            {
+                AttachToken();
+                var res = await _http.DeleteAsync($"api/events/{id}");
+                return res.IsSuccessStatusCode;
+            }
+            catch (HttpRequestException)
+            {
+                throw new Exception("CONNECTION ERROR: Cannot reach the API. Are both projects running?");
+            }
         }
 
-        public async Task<List<EventViewModel>> GetMyEventsAsync() => await GetAsync<List<EventViewModel>>("api/events/my", true) ?? new();
+        public async Task<List<EventViewModel>> GetMyEventsAsync()
+        {
+            try
+            {
+                return await GetAsync<List<EventViewModel>>("api/events/my", true) ?? new();
+            }
+            catch (HttpRequestException)
+            {
+                throw new Exception("CONNECTION ERROR: Cannot reach the API. Are both projects running?");
+            }
+        }
 
         // --- Registrations ---
         public async Task<(bool Success, string Message)> RegisterForEventAsync(int eventId)
         {
-            AttachToken();
-            var res = await _http.PostAsync($"api/registrations/{eventId}", null);
-            if (res.IsSuccessStatusCode) return (true, "Registered successfully!");
             try
             {
-                var err = JsonSerializer.Deserialize<Dictionary<string, string>>(await res.Content.ReadAsStringAsync(), _json);
-                return (false, err?["message"] ?? "Failed to register.");
+                AttachToken();
+                var res = await _http.PostAsync($"api/registrations/{eventId}", null);
+                if (res.IsSuccessStatusCode) return (true, "Registered successfully!");
+                try
+                {
+                    var err = JsonSerializer.Deserialize<Dictionary<string, string>>(await res.Content.ReadAsStringAsync(), _json);
+                    return (false, err?["message"] ?? "Failed to register.");
+                }
+                catch { return (false, "Failed to register."); }
             }
-            catch { return (false, "Failed to register."); }
+            catch (HttpRequestException)
+            {
+                throw new Exception("CONNECTION ERROR: Cannot reach the API. Are both projects running?");
+            }
         }
 
         public async Task<bool> CancelRegistrationAsync(int eventId)
         {
-            AttachToken();
-            var res = await _http.DeleteAsync($"api/registrations/{eventId}");
-            return res.IsSuccessStatusCode;
+            try
+            {
+                AttachToken();
+                var res = await _http.DeleteAsync($"api/registrations/{eventId}");
+                return res.IsSuccessStatusCode;
+            }
+            catch (HttpRequestException)
+            {
+                throw new Exception("CONNECTION ERROR: Cannot reach the API. Are both projects running?");
+            }
         }
 
-        public async Task<List<RegistrationViewModel>> GetMyRegistrationsAsync() => await GetAsync<List<RegistrationViewModel>>("api/registrations/my", true) ?? new();
+        public async Task<List<RegistrationViewModel>> GetMyRegistrationsAsync()
+        {
+            try
+            {
+                return await GetAsync<List<RegistrationViewModel>>("api/registrations/my", true) ?? new();
+            }
+            catch (HttpRequestException)
+            {
+                throw new Exception("CONNECTION ERROR: Cannot reach the API. Are both projects running?");
+            }
+        }
 
         // --- Helpers ---
         private async Task<T?> GetAsync<T>(string url, bool withAuth = false)

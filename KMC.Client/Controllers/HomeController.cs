@@ -11,13 +11,22 @@ namespace KMC.Client.Controllers
 
         public async Task<IActionResult> Index(string? category, DateTime? date, string? location)
         {
-            // Save search filters to ViewBag so the form remembers what the user typed
-            ViewBag.Category = category;
-            ViewBag.Date = date?.ToString("yyyy-MM-dd");
-            ViewBag.Location = location;
+            try
+            {
+                // Save search filters to ViewBag so the form remembers what the user typed
+                ViewBag.Category = category;
+                ViewBag.Date = date?.ToString("yyyy-MM-dd");
+                ViewBag.Location = location;
 
-            var events = await _api.GetEventsAsync(category, date, location);
-            return View(events);
+                var events = await _api.GetEventsAsync(category, date, location);
+                return View(events);
+            }
+            catch (Exception ex)
+            {
+                // Display error message to user
+                ViewBag.ErrorMessage = ex.Message;
+                return View(new List<KMC.Client.Models.EventViewModel>());
+            }
         }
     }
 }
