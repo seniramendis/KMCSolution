@@ -18,18 +18,27 @@ namespace KMC.Client.Controllers
         {
             if (!ModelState.IsValid) return View(model);
 
-            var response = await _api.LoginAsync(model);
-            if (response != null && !string.IsNullOrEmpty(response.Token))
+            try
             {
-                // Save token and user details in the browser session!
-                HttpContext.Session.SetString("JwtToken", response.Token);
-                HttpContext.Session.SetString("FullName", response.FullName ?? "");
-                HttpContext.Session.SetString("Role", response.Role ?? "");
-                return RedirectToAction("Index", "Home");
-            }
+                var response = await _api.LoginAsync(model);
+                if (response != null && !string.IsNullOrEmpty(response.Token))
+                {
+                    // Save token and user details in the browser session!
+                    HttpContext.Session.SetString("JwtToken", response.Token);
+                    HttpContext.Session.SetString("FullName", response.FullName ?? "");
+                    HttpContext.Session.SetString("Role", response.Role ?? "");
+                    return RedirectToAction("Index", "Home");
+                }
 
-            ViewBag.Error = "Invalid email or password.";
-            return View(model);
+                ViewBag.Error = "Invalid email or password.";
+                return View(model);
+            }
+            catch (Exception)
+            {
+                // THE FIX: Intercepts the API rejection so the app doesn't crash!
+                ViewBag.Error = "Invalid email or password.";
+                return View(model);
+            }
         }
 
         [HttpGet]
@@ -73,7 +82,6 @@ namespace KMC.Client.Controllers
             }
         }
 
-        // The Logout Method
         [HttpGet]
         public IActionResult Logout()
         {
