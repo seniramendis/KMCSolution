@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Mvc;
 using KMC.API.DTOs;
 using KMC.API.Data;
 using KMC.API.Models;
-using System.Security.Claims;
 
 namespace KMC.API.Controllers
 {
@@ -25,9 +24,11 @@ namespace KMC.API.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var organizerId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? "0");
+            // THE FIX: Look for the exact "id" label that your AuthController created!
+            var organizerId = int.Parse(User.FindFirst("id")?.Value ?? "0");
+
             if (organizerId == 0)
-                return Unauthorized("Invalid user ID");
+                return Unauthorized("Invalid user ID. The token does not contain your ID.");
 
             var newEvent = new Event
             {
