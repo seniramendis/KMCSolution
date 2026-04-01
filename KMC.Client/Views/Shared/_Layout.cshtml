@@ -20,6 +20,7 @@
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse">
                     <span class="navbar-toggler-icon"></span>
                 </button>
+                
                 <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
                     <ul class="navbar-nav flex-grow-1">
                         <li class="nav-item">
@@ -32,14 +33,16 @@
                         {
                             if (Context.Session.GetString("Role") == "Organizer")
                             {
-                                <li class="nav-item"><a class="nav-link fw-semibold" asp-controller="Event" asp-action="Dashboard">Dashboard</a></li>
+                                <li class="nav-item"><a class="nav-link fw-semibold text-dark" asp-controller="Event" asp-action="Dashboard">My Dashboard</a></li>
                             }
                             else
                             {
-                                <li class="nav-item"><a class="nav-link fw-semibold" asp-controller="Event" asp-action="MyRegistrations">My Tickets</a></li>
+                                <li class="nav-item"><a class="nav-link fw-semibold text-dark" asp-controller="Event" asp-action="MyRegistrations">My Tickets</a></li>
                             }
                             <li class="nav-item ms-3">
-                                <a class="btn btn-outline-danger btn-sm mt-1" asp-controller="Auth" asp-action="Logout">Logout (@Context.Session.GetString("FullName"))</a>
+                                <a class="btn btn-outline-danger btn-sm mt-1" asp-controller="Auth" asp-action="Logout">
+                                    <i class="bi bi-box-arrow-right"></i> Logout (@Context.Session.GetString("FullName"))
+                                </a>
                             </li>
                         }
                         else

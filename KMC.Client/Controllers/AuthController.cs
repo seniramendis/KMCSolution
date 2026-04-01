@@ -73,6 +73,7 @@ namespace KMC.Client.Controllers
             }
         }
 
+        // The Logout Method
         [HttpGet]
         public IActionResult Logout()
         {
