@@ -20,6 +20,7 @@ namespace KMC.API.DTOs
     }
 
     // 3. Used when an Organizer creates a new event
+    // 3. Used when an Organizer creates a new event
     public class EventCreateDto
     {
         [Required] public required string Title { get; set; }
@@ -28,7 +29,8 @@ namespace KMC.API.DTOs
         public DateTime EventDate { get; set; }
         [Required] public required string Location { get; set; }
         public int Capacity { get; set; }
-        public int OrganizerId { get; set; }
+
+
         public string? ImageUrl { get; set; }
     }
 }

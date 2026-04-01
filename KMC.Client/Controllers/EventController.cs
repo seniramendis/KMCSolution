@@ -1,6 +1,9 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
+using System.Threading.Tasks;
 using KMC.Client.Models;
 using KMC.Client.Services;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -9,8 +12,13 @@ namespace KMC.Client.Controllers
     public class EventController : Controller
     {
         private readonly ApiService _api;
+        private readonly IWebHostEnvironment _env; // NEW: Gives us access to the wwwroot folder
 
-        public EventController(ApiService api) => _api = api;
+        public EventController(ApiService api, IWebHostEnvironment env)
+        {
+            _api = api;
+            _env = env;
+        }
 
         // --- PUBLIC VIEWS ---
         public async Task<IActionResult> Details(int id)
@@ -24,91 +32,52 @@ namespace KMC.Client.Controllers
         public IActionResult Create()
         {
             if (HttpContext.Session.GetString("Role") != "Organizer") return RedirectToAction("Login", "Auth");
-            return View(new CreateEventViewModel
-            {
-                Title = string.Empty,
-                Description = string.Empty,
-                Category = "Music",
-                Location = string.Empty,
-                Capacity = 100,
-                EventDate = DateTime.Now.AddDays(7)
-            });
+            return View(new CreateEventViewModel());
         }
 
         [HttpPost]
-        public async Task<IActionResult> Create(CreateEventViewModel model, IFormFile? imageFile)
+        public async Task<IActionResult> Create(CreateEventViewModel model)
         {
             if (HttpContext.Session.GetString("Role") != "Organizer") return RedirectToAction("Login", "Auth");
 
-            if (!ModelState.IsValid)
+            try
             {
+                // NO IMAGES. Just send the raw text straight to the API!
+                var result = await _api.CreateEventAsync(model);
+
+                if (result == null)
+                {
+                    ViewBag.Error = "Failed to create event.";
+                    return View(model);
+                }
+
+                return RedirectToAction("Dashboard");
+            }
+            catch (Exception ex)
+            {
+                ViewBag.Error = $"ERROR: {ex.Message}";
                 return View(model);
             }
-
-            // Convert the uploaded image into a Base64 string to send securely via JSON
-            if (imageFile != null && imageFile.Length > 0)
-            {
-                using var ms = new MemoryStream();
-                await imageFile.CopyToAsync(ms);
-                model.ImageUrl = $"data:{imageFile.ContentType};base64,{Convert.ToBase64String(ms.ToArray())}";
-            }
-
-            var result = await _api.CreateEventAsync(model);
-            if (result == null)
-            {
-                ViewBag.Error = "Failed to create event.";
-                return View(model);
-            }
-            return RedirectToAction("Dashboard");
-        }
-
-        public async Task<IActionResult> Edit(int id)
-        {
-            if (HttpContext.Session.GetString("Role") != "Organizer") return RedirectToAction("Login", "Auth");
-            var ev = await _api.GetEventAsync(id);
-            if (ev == null) return NotFound();
-
-            ViewBag.EventId = id;
-            return View(new CreateEventViewModel
-            {
-                Title = ev.Title ?? string.Empty,
-                Description = ev.Description ?? string.Empty,
-                Category = ev.Category ?? "Music",
-                Location = ev.Location ?? string.Empty,
-                EventDate = ev.EventDate,
-                Capacity = ev.Capacity,
-                ImageUrl = ev.ImageUrl
-            });
         }
 
         [HttpPost]
-        public async Task<IActionResult> Edit(int id, CreateEventViewModel model, IFormFile? imageFile)
+        public async Task<IActionResult> Edit(int id, CreateEventViewModel model)
         {
             if (HttpContext.Session.GetString("Role") != "Organizer") return RedirectToAction("Login", "Auth");
 
-            if (!ModelState.IsValid)
+            try
             {
+                var result = await _api.UpdateEventAsync(id, model);
+                if (result == null) { ViewBag.Error = "Failed to update event."; ViewBag.EventId = id; return View(model); }
+                return RedirectToAction("Dashboard");
+            }
+            catch (Exception ex)
+            {
+                ViewBag.Error = $"ERROR: {ex.Message}";
                 ViewBag.EventId = id;
                 return View(model);
             }
-
-            if (imageFile != null && imageFile.Length > 0)
-            {
-                using var ms = new MemoryStream();
-                await imageFile.CopyToAsync(ms);
-                model.ImageUrl = $"data:{imageFile.ContentType};base64,{Convert.ToBase64String(ms.ToArray())}";
-            }
-
-            var result = await _api.UpdateEventAsync(id, model);
-            if (result == null)
-            {
-                ViewBag.Error = "Failed to update event.";
-                ViewBag.EventId = id;
-                return View(model);
-            }
-            return RedirectToAction("Dashboard");
         }
-
         [HttpPost]
         public async Task<IActionResult> Delete(int id)
         {

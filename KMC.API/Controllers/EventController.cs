@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using KMC.API.DTOs;
 using KMC.API.Data;
 using KMC.API.Models;
+using System.Linq;
 
 namespace KMC.API.Controllers
 {
@@ -21,14 +22,10 @@ namespace KMC.API.Controllers
         [Authorize]
         public async Task<IActionResult> CreateEvent([FromBody] EventCreateDto dto)
         {
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
+            if (!ModelState.IsValid) return BadRequest(ModelState);
 
-            // THE FIX: Look for the exact "id" label that your AuthController created!
             var organizerId = int.Parse(User.FindFirst("id")?.Value ?? "0");
-
-            if (organizerId == 0)
-                return Unauthorized("Invalid user ID. The token does not contain your ID.");
+            if (organizerId == 0) return Unauthorized("Invalid user ID.");
 
             var newEvent = new Event
             {
@@ -45,24 +42,98 @@ namespace KMC.API.Controllers
             _context.Events.Add(newEvent);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction(nameof(GetEvent), new { id = newEvent.EventId }, newEvent);
+            return Ok(new { message = "Event created successfully!" });
         }
 
+        // NEW: Automatically attaches the Organizer's Full Name!
         [HttpGet("{id}")]
-        public async Task<IActionResult> GetEvent(int id)
+        public IActionResult GetEvent(int id)
         {
-            var @event = await _context.Events.FindAsync(id);
-            if (@event == null)
-                return NotFound();
+            var ev = (from e in _context.Events
+                      join u in _context.Users on e.OrganizerId equals u.UserId // FIX: Changed to u.UserId
+                      where e.EventId == id
+                      select new
+                      {
+                          e.EventId,
+                          e.Title,
+                          e.Description,
+                          e.Category,
+                          e.EventDate,
+                          e.Location,
+                          e.Capacity,
+                          e.ImageUrl,
+                          OrganizerName = u.FullName
+                      }).FirstOrDefault();
 
-            return Ok(@event);
+            if (ev == null) return NotFound();
+            return Ok(ev);
         }
 
+        // NEW: Automatically attaches names to the public feed!
         [HttpGet]
         public IActionResult GetAllEvents()
         {
-            var events = _context.Events.ToList();
+            var events = (from e in _context.Events
+                          join u in _context.Users on e.OrganizerId equals u.UserId // FIX: Changed to u.UserId
+                          select new
+                          {
+                              e.EventId,
+                              e.Title,
+                              e.Description,
+                              e.Category,
+                              e.EventDate,
+                              e.Location,
+                              e.Capacity,
+                              e.ImageUrl,
+                              OrganizerName = u.FullName
+                          }).ToList();
+
             return Ok(events);
+        }
+
+        // NEW: Automatically attaches names to your Dashboard!
+        [HttpGet("my")]
+        [Authorize]
+        public IActionResult GetMyEvents()
+        {
+            var organizerId = int.Parse(User.FindFirst("id")?.Value ?? "0");
+            if (organizerId == 0) return Unauthorized("Invalid user ID.");
+
+            var myEvents = (from e in _context.Events
+                            join u in _context.Users on e.OrganizerId equals u.UserId // FIX: Changed to u.UserId
+                            where e.OrganizerId == organizerId
+                            select new
+                            {
+                                e.EventId,
+                                e.Title,
+                                e.Description,
+                                e.Category,
+                                e.EventDate,
+                                e.Location,
+                                e.Capacity,
+                                e.ImageUrl,
+                                OrganizerName = u.FullName
+                            }).ToList();
+
+            return Ok(myEvents);
+        }
+
+        [HttpDelete("{id}")]
+        [Authorize]
+        public async Task<IActionResult> DeleteEvent(int id)
+        {
+            var organizerId = int.Parse(User.FindFirst("id")?.Value ?? "0");
+            if (organizerId == 0) return Unauthorized("Invalid user ID.");
+
+            var eventToDelete = await _context.Events.FindAsync(id);
+            if (eventToDelete == null) return NotFound("Event not found.");
+
+            if (eventToDelete.OrganizerId != organizerId) return Forbid("You can only delete your own events.");
+
+            _context.Events.Remove(eventToDelete);
+            await _context.SaveChangesAsync();
+
+            return Ok(new { message = "Event deleted successfully" });
         }
     }
 }

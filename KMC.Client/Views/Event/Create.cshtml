@@ -1,6 +1,9 @@
 ﻿@model KMC.Client.Models.CreateEventViewModel
 @{ ViewData["Title"] = "Create Event"; }
 
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+<link rel="stylesheet" type="text/css" href="https://npmcdn.com/flatpickr/dist/themes/material_blue.css">
+
 <div class="container mt-5" style="max-width: 600px;">
     <h2 class="mb-4">Create New Event</h2>
 
@@ -15,10 +18,7 @@
             <input asp-for="Title" class="form-control" required />
         </div>
 
-        <div class="mb-3">
-            <label class="form-label fw-bold">Event Banner Image</label>
-            <input type="file" name="imageFile" class="form-control" accept="image/*" />
-        </div>
+        
 
         <div class="mb-3">
             <label class="form-label fw-bold">Description</label>
@@ -37,7 +37,7 @@
             </div>
             <div class="col-md-6 mb-3">
                 <label class="form-label fw-bold">Date & Time</label>
-                <input asp-for="EventDate" type="datetime-local" class="form-control" required />
+                <input asp-for="EventDate" class="form-control custom-calendar" placeholder="Click to select Date & Time..." required style="background-color: white;" />
             </div>
         </div>
 
@@ -58,3 +58,14 @@
         </div>
     </form>
 </div>
+
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<script>
+    // This looks for our "custom-calendar" box and turns it into a smooth UI
+    flatpickr(".custom-calendar", {
+        enableTime: true,          // Allows time selection
+        dateFormat: "Y-m-d H:i",   // Matches C# format perfectly
+        minDate: "today",          // Stops users from picking dates in the past!
+        time_24hr: false           // Uses standard AM/PM format
+    });
+</script>
