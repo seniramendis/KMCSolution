@@ -13,7 +13,6 @@ namespace KMC.Client.Controllers
         {
             try
             {
-                // Save search filters to ViewBag so the form remembers what the user typed
                 ViewBag.Category = category;
                 ViewBag.Date = date?.ToString("yyyy-MM-dd");
                 ViewBag.Location = location;
@@ -23,10 +22,21 @@ namespace KMC.Client.Controllers
             }
             catch (Exception ex)
             {
-                // Display error message to user
                 ViewBag.ErrorMessage = ex.Message;
                 return View(new List<KMC.Client.Models.EventViewModel>());
             }
+        }
+
+        // New Action for About Page
+        public IActionResult About()
+        {
+            return View();
+        }
+
+        // New Action for Contact Page
+        public IActionResult Contact()
+        {
+            return View();
         }
     }
 }
