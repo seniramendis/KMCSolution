@@ -1,11 +1,41 @@
 ﻿@model IEnumerable<KMC.Client.Models.EventViewModel>
 @{ ViewData["Title"] = "Home"; }
 
-<div class="container-fluid p-0 mb-4">
+<style>
+    /* 1. Stops the side-to-side scrolling */
+    body {
+        overflow-x: hidden;
+    }
+
+    /* 2. Stretches the box edge-to-edge */
+    .hero-breakout {
+        width: 100vw;
+        position: relative;
+        left: 50%;
+        transform: translateX(-50%);
+        margin-top: -1.5rem; /* Default flush fit for Desktop */
+    }
+
+    /* 3. RESPONSIVE FIX: Pulls the box up more on Tablets */
+    @@media (max-width: 991.98px) {
+        .hero-breakout {
+            margin-top: -2.5rem; 
+        }
+    }
+
+    /* 4. RESPONSIVE FIX: Pulls the box up perfectly on Mobile Phones */
+    @@media (max-width: 575.98px) {
+        .hero-breakout {
+            margin-top: -3.2rem; 
+        }
+    }
+</style>
+
+<div class="hero-breakout mb-5">
     <div id="hero-carousel" class="position-relative" style="
         min-height: 45vh; 
-        border-radius: 1.5rem; 
-        margin: 0 15px; 
+        width: 100%; 
+        margin: 0; 
         overflow: hidden; 
         background-color: var(--theme-primary);
         box-shadow: 0 10px 30px rgba(139, 0, 0, 0.2);">

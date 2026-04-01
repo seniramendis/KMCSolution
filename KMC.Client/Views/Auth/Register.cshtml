@@ -1,43 +1,81 @@
 ﻿@model KMC.Client.Models.RegisterViewModel
 @{ ViewData["Title"] = "Register"; }
 
-<div class="container section">
-    <div class="row justify-content-center">
-        <div class="col-md-6">
-            <div class="form-card">
-                <h2 class="mb-4 text-center">Create an Account</h2>
-                
-                @if (ViewBag.Error != null)
-                {
-                    <div class="alert alert-danger">@ViewBag.Error</div>
-                }
+<style>
+    .register-card { border: none; border-radius: 1rem; box-shadow: 0 12px 40px rgba(139, 0, 0, 0.15); overflow: hidden; background: #ffffff; }
+    .register-image { 
+        background: linear-gradient(rgba(139, 0, 0, 0.2), rgba(0, 0, 0, 0.4)), 
+                    url('https://cdn.audleytravel.com/1050/750/79/542845-traditional-kandyan-dancers.webp') center/cover no-repeat; 
+        min-height: 550px; 
+        position: relative;
+    }
+    .kandyan-accent-text { color: var(--theme-primary); font-weight: 800; font-family: 'Georgia', serif; letter-spacing: 1px; }
+</style>
 
-                <form asp-action="Register" method="post">
-                    <div class="field mb-3">
-                        <label asp-for="FullName" class="label">Full Name</label>
-                        <input asp-for="FullName" class="input" required />
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-11 col-xl-10">
+            <div class="card register-card flex-row flex-wrap p-0">
+                <div class="col-md-5 register-image d-none d-md-block"></div>
+                <div class="col-md-7 p-4 p-lg-5">
+                    <div class="text-center mb-4">
+                        <h2 class="kandyan-accent-text">Ayubowan</h2>
+                        <p class="text-muted">Create your account to join the KMC community.</p>
                     </div>
-                    <div class="field mb-3">
-                        <label asp-for="Email" class="label">Email Address</label>
-                        <input asp-for="Email" type="email" class="input" required />
+
+                    <form asp-action="Register" method="post">
+                        <div asp-validation-summary="ModelOnly" class="text-danger small mb-3"></div>
+                        <div class="row g-3">
+                            <div class="col-12">
+                                <div class="form-floating">
+                                    <input asp-for="FullName" class="form-control rounded-3" placeholder="Full Name" />
+                                    <label asp-for="FullName">Full Name</label>
+                                    <span asp-validation-for="FullName" class="text-danger small"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-floating">
+                                    <input asp-for="Email" type="email" class="form-control rounded-3" placeholder="Email" />
+                                    <label asp-for="Email">Email Address</label>
+                                    <span asp-validation-for="Email" class="text-danger small"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-floating">
+                                    <select asp-for="Role" class="form-select rounded-3">
+                                        <option value="User">Attendee</option>
+                                        <option value="Organizer">Event Organizer</option>
+                                    </select>
+                                    <label asp-for="Role">Register As</label>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-floating">
+                                    <input asp-for="Password" type="password" class="form-control rounded-3" placeholder="Password" />
+                                    <label asp-for="Password">Password</label>
+                                    <span asp-validation-for="Password" class="text-danger small"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-floating">
+                                    <input asp-for="ConfirmPassword" type="password" class="form-control rounded-3" placeholder="Confirm" />
+                                    <label asp-for="ConfirmPassword">Confirm Password</label>
+                                    <span asp-validation-for="ConfirmPassword" class="text-danger small"></span>
+                                </div>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100 py-3 mt-4 mb-3 shadow-sm rounded-pill">Join KMC Solution</button>
+                    </form>
+                    <div class="text-center mt-3">
+                        <span class="text-muted small">Already have an account?</span> 
+                        <a asp-action="Login" class="ms-1 fw-bold" style="color: var(--theme-accent); text-decoration: none;">Sign In</a>
                     </div>
-                    <div class="field mb-3">
-                        <label asp-for="Password" class="label">Password</label>
-                        <input asp-for="Password" type="password" class="input" required />
-                    </div>
-                    <div class="field mb-4">
-                        <label asp-for="Role" class="label">Account Type</label>
-                        <select asp-for="Role" class="select">
-                            <option value="Public">General Public (Attendee)</option>
-                            <option value="Organizer">Event Organizer</option>
-                        </select>
-                    </div>
-                    <button type="submit" class="btn btn-primary w-100">Register</button>
-                </form>
-                <div class="text-center mt-3">
-                    <a asp-action="Login">Already have an account? Log in</a>
                 </div>
             </div>
         </div>
     </div>
 </div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

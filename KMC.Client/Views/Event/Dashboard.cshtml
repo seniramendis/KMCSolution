@@ -1,46 +1,193 @@
 ﻿@model IEnumerable<KMC.Client.Models.EventViewModel>
-@{ ViewData["Title"] = "Organizer Dashboard"; }
+@{ 
+    ViewData["Title"] = "Organizer Dashboard"; 
+    // Quick Stats Calculation
+    var totalEvents = Model.Count();
+    var totalRegistrations = Model.Sum(e => e.RegisteredCount);
+}
 
-<div class="container mt-5">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h1>My Events Dashboard</h1>
-        <a asp-action="Create" class="btn btn-primary">Create New Event</a>
+<style>
+    /* Premium KPI Cards */
+    .kpi-card {
+        border: none;
+        border-radius: 1.5rem;
+        background: #fff;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        border-bottom: 5px solid transparent;
+    }
+    .kpi-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 25px rgba(139, 0, 0, 0.1);
+    }
+    .kpi-maroon { border-color: var(--theme-primary); }
+    .kpi-gold { border-color: var(--theme-accent); }
+    
+    .icon-box {
+        width: 50px;
+        height: 50px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 1rem;
+        font-size: 1.5rem;
+    }
+
+    /* Enhanced Table styling */
+    .event-table thead {
+        background-color: var(--theme-primary);
+        color: white;
+    }
+    .event-row {
+        transition: background-color 0.2s ease;
+    }
+    .event-row:hover {
+        background-color: rgba(212, 175, 55, 0.05);
+    }
+    
+    .fill-rate-bar {
+        height: 8px;
+        border-radius: 10px;
+        background-color: #eee;
+        overflow: hidden;
+    }
+    .fill-rate-progress {
+        height: 100%;
+        background-color: var(--theme-accent);
+    }
+</style>
+
+<div class="container py-4">
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-5 gap-3">
+        <div>
+            <h1 class="fw-bold" style="color: var(--theme-primary); font-family: 'Georgia', serif;">Organizer Dashboard</h1>
+            <p class="text-muted mb-0">Managing @totalEvents active Kandyan cultural experiences.</p>
+        </div>
+        <div class="d-flex gap-2">
+            <a asp-action="Create" class="btn btn-primary btn-lg shadow-sm">
+                <i class="bi bi-plus-circle me-2"></i>Create Event
+            </a>
+        </div>
     </div>
 
-    @if (!Model.Any())
-    {
-        <div class="alert alert-info">You haven't created any events yet.</div>
-    }
-    else
-    {
-        <table class="table table-striped table-hover">
-            <thead class="table-dark">
-                <tr>
-                    <th>Title</th>
-                    <th>Date</th>
-                    <th>Category</th>
-                    <th>Registrations</th>
-                    <th>Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach (var eventItem in Model)
-                {
+    <div class="row g-4 mb-5">
+        <div class="col-md-6">
+            <div class="card kpi-card kpi-maroon p-4 shadow-sm">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <h6 class="text-muted text-uppercase small fw-bold">Active Events</h6>
+                        <h2 class="fw-bold mb-0">@totalEvents</h2>
+                    </div>
+                    <div class="icon-box bg-light text-maroon">
+                        <i class="bi bi-calendar-event" style="color: var(--theme-primary);"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card kpi-card kpi-gold p-4 shadow-sm">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <h6 class="text-muted text-uppercase small fw-bold">Total Attendees</h6>
+                        <h2 class="fw-bold mb-0">@totalRegistrations</h2>
+                    </div>
+                    <div class="icon-box bg-light text-gold">
+                        <i class="bi bi-people-fill" style="color: var(--theme-accent);"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card border-0 shadow-sm rounded-4 p-3 mb-4">
+        <div class="row g-3 align-items-center">
+            <div class="col-md-6">
+                <div class="input-group">
+                    <span class="input-group-text bg-white border-end-0 rounded-start-pill ps-3">
+                        <i class="bi bi-search text-muted"></i>
+                    </span>
+                    <input type="text" id="dashboardSearch" class="form-control border-start-0 rounded-end-pill" placeholder="Search event title or location...">
+                </div>
+            </div>
+            <div class="col-md-6 text-md-end">
+                <span class="text-muted small">Viewing @Model.Count() Events</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0 event-table">
+                <thead>
                     <tr>
-                        <td><strong>@eventItem.Title</strong></td>
-                        <td>@eventItem.EventDate.ToString("MMM dd, yyyy HH:mm")</td>
-                        <td><span class="badge bg-secondary">@eventItem.Category</span></td>
-                        <td>@eventItem.RegisteredCount / @eventItem.Capacity</td>
-                        <td>
-                            <a asp-action="Details" asp-route-id="@eventItem.Id" class="btn btn-sm btn-info text-white">View</a>
-                            <form asp-action="Delete" asp-route-id="@eventItem.Id" method="post" style="display:inline;" onsubmit="return confirm('Delete this event?');">
-                                <button type="submit" class="btn btn-sm btn-danger">Delete</button>
-                            </form>
-                            <a href="/Event/Attendees/@eventItem.Id" class="btn btn-primary">View Attendees</a>
-                        </td>
+                        <th class="ps-4 py-3">Event Details</th>
+                        <th class="py-3 text-center">Category</th>
+                        <th class="py-3 text-center" style="width: 200px;">Fill Progress</th>
+                        <th class="py-3 text-center">Capacity</th>
+                        <th class="py-3 text-end pe-4">Manage</th>
                     </tr>
-                }
-            </tbody>
-        </table>
-    }
+                </thead>
+                <tbody class="bg-white">
+                    @foreach (var item in Model)
+                    {
+                        var fillRate = item.Capacity > 0 ? (int)((double)item.RegisteredCount / item.Capacity * 100) : 0;
+                        <tr class="event-row">
+                            <td class="ps-4 py-4">
+                                <div class="fw-bold fs-5 text-dark">@item.Title</div>
+                                <div class="text-muted small">
+                                    <i class="bi bi-calendar3 me-1"></i> @item.EventDate.ToString("MMM dd, yyyy") 
+                                    <span class="mx-2 text-silver">|</span>
+                                    <i class="bi bi-geo-alt me-1"></i> @item.Location
+                                </div>
+                            </td>
+                            <td class="text-center">
+                                <span class="badge rounded-pill px-3 py-2" style="background: rgba(139, 0, 0, 0.05); color: var(--theme-primary); border: 1px solid var(--theme-primary);">
+                                    @item.Category
+                                </span>
+                            </td>
+                            <td class="text-center px-4">
+                                <div class="d-flex align-items-center justify-content-between mb-1 small">
+                                    <span class="fw-bold">@fillRate%</span>
+                                    <span class="text-muted">@item.RegisteredCount/@item.Capacity</span>
+                                </div>
+                                <div class="fill-rate-bar">
+                                    <div class="fill-rate-progress" style="width: @fillRate%"></div>
+                                </div>
+                            </td>
+                            <td class="text-center">
+                                <span class="fw-bold" style="color: var(--theme-accent);">@item.SpotsLeft left</span>
+                            </td>
+                            <td class="text-end pe-4">
+                                <div class="btn-group">
+                                    <a asp-action="Attendees" asp-route-id="@item.Id" class="btn btn-sm btn-outline-dark rounded-start-pill px-3" title="View Attendees">
+                                        <i class="bi bi-people"></i>
+                                    </a>
+                                    <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-outline-primary px-3" title="Edit Event">
+                                        <i class="bi bi-pencil"></i>
+                                    </a>
+                                    <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-outline-primary rounded-end-pill px-3" title="View Public Page">
+                                        <i class="bi bi-eye"></i>
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
 </div>
+
+@section Scripts {
+    <script>
+        // Simple search filter
+        document.getElementById('dashboardSearch').addEventListener('keyup', function() {
+            let filter = this.value.toLowerCase();
+            let rows = document.querySelectorAll('.event-row');
+            
+            rows.forEach(row => {
+                let text = row.innerText.toLowerCase();
+                row.style.display = text.includes(filter) ? '' : 'none';
+            });
+        });
+    </script>
+}

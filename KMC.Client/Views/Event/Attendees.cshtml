@@ -1,41 +1,126 @@
 ﻿@model IEnumerable<KMC.Client.Services.AttendeeViewModel>
-@{ ViewData["Title"] = "Guest List"; }
+@{ 
+    ViewData["Title"] = "Guest List";
+    var attendeeCount = Model?.Count() ?? 0;
+}
 
-<div class="container mt-5" style="max-width: 800px;">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2><i class="bi bi-people-fill text-primary"></i> Event Guest List</h2>
-        <a asp-action="Dashboard" class="btn btn-outline-secondary">Back to Dashboard</a>
+<style>
+    /* Premium Table Styling */
+    .guest-table thead {
+        background-color: var(--theme-primary);
+        color: #fff;
+        border-bottom: 3px solid var(--theme-accent);
+    }
+
+    .guest-row {
+        transition: background-color 0.2s ease;
+        border-bottom: 1px solid #eee;
+    }
+
+    .guest-row:hover {
+        background-color: rgba(212, 175, 55, 0.05);
+    }
+
+    .attendee-name {
+        color: var(--theme-primary);
+        font-weight: 700;
+    }
+
+    /* Action Icon Box */
+    .mail-icon-box {
+        width: 35px;
+        height: 35px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        background: rgba(139, 0, 0, 0.1);
+        color: var(--theme-primary);
+        transition: all 0.3s ease;
+    }
+
+    .mail-icon-box:hover {
+        background: var(--theme-primary);
+        color: #fff;
+    }
+
+    /* Empty State Glassmorphism */
+    .empty-state-card {
+        background: rgba(255, 255, 255, 0.8);
+        backdrop-filter: blur(10px);
+        border: 2px dashed var(--theme-accent);
+        border-radius: 1.5rem;
+    }
+</style>
+
+<div class="container py-5" style="max-width: 900px;">
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-5 gap-3 border-bottom pb-4" style="border-color: var(--theme-accent) !important;">
+        <div>
+            <h1 class="fw-bold mb-1" style="color: var(--theme-primary); font-family: 'Georgia', serif;">
+                <i class="bi bi-people-fill me-2"></i>Event Guest List
+            </h1>
+            <p class="text-muted mb-0">Managing @attendeeCount confirmed registrations.</p>
+        </div>
+        <div class="d-flex align-items-center gap-3">
+            <span class="badge rounded-pill px-4 py-2 fs-6" style="background-color: var(--theme-accent); color: var(--theme-primary);">
+                @attendeeCount Attendees
+            </span>
+            <a asp-action="Dashboard" class="btn btn-outline-dark rounded-pill px-4">
+                <i class="bi bi-arrow-left me-2"></i>Back
+            </a>
+        </div>
     </div>
 
-    <div class="card shadow-sm border-0">
+    <div class="card shadow-lg border-0 rounded-4 overflow-hidden">
         <div class="card-body p-0">
             @if (Model == null || !Model.Any())
             {
-                <div class="alert alert-light text-center m-0 py-5">
-                    <h5 class="text-muted">No one has registered for this event yet.</h5>
+                <div class="empty-state-card text-center m-4 py-5">
+                    <i class="bi bi-person-x" style="font-size: 4rem; color: var(--theme-accent);"></i>
+                    <h4 class="mt-3 fw-bold text-dark">No registrations yet</h4>
+                    <p class="text-muted">Once someone registers, they will appear here.</p>
+                    <a asp-action="Dashboard" class="btn btn-primary rounded-pill px-4 mt-2">Check Dashboard</a>
                 </div>
             }
             else
             {
-                <table class="table table-hover table-striped mb-0">
-                    <thead class="table-dark">
-                        <tr>
-                            <th class="ps-4">Attendee Name</th>
-                            <th>Email Address</th>
-                            <th>Registration Date</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach (var person in Model)
-                        {
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0 guest-table">
+                        <thead>
                             <tr>
-                                <td class="ps-4 fw-bold">@person.FullName</td>
-                                <td><a href="mailto:@person.Email" class="text-decoration-none">@person.Email</a></td>
-                                <td>@person.RegistrationDate.ToString("MMM dd, yyyy - h:mm tt")</td>
+                                <th class="ps-4 py-3">Attendee Name</th>
+                                <th class="py-3">Email Address</th>
+                                <th class="py-3 text-end pe-4">Registration Date</th>
                             </tr>
-                        }
-                    </tbody>
-                </table>
+                        </thead>
+                        <tbody class="bg-white">
+                            @foreach (var person in Model)
+                            {
+                                <tr class="guest-row">
+                                    <td class="ps-4 py-4">
+                                        <div class="d-flex align-items-center">
+                                            <div class="avatar-circle me-3" style="width: 40px; height: 40px; background: var(--theme-bg); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; color: var(--theme-primary); border: 1px solid var(--theme-accent);">
+                                                @person.FullName.Substring(0, 1).ToUpper()
+                                            </div>
+                                            <span class="attendee-name">@person.FullName</span>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <a href="mailto:@person.Email" class="text-decoration-none d-flex align-items-center gap-2" style="color: var(--theme-text);">
+                                            <div class="mail-icon-box">
+                                                <i class="bi bi-envelope-fill small"></i>
+                                            </div>
+                                            @person.Email
+                                        </a>
+                                    </td>
+                                    <td class="text-end pe-4 text-muted small fw-bold">
+                                        <i class="bi bi-clock me-1"></i> @person.RegistrationDate.ToString("MMM dd, yyyy - h:mm tt")
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
             }
         </div>
     </div>

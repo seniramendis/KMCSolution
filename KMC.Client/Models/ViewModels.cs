@@ -9,24 +9,38 @@ namespace KMC.Client.Models
     public class LoginViewModel
     {
         [Required]
+        [EmailAddress]
         public string Email { get; set; } = string.Empty;
 
         [Required]
+        [DataType(DataType.Password)]
         public string Password { get; set; } = string.Empty;
     }
 
     public class RegisterViewModel
     {
         [Required]
+        [Display(Name = "Full Name")]
         public string FullName { get; set; } = string.Empty;
 
         [Required]
+        [EmailAddress]
         public string Email { get; set; } = string.Empty;
 
         [Required]
+        [StringLength(100, MinimumLength = 6, ErrorMessage = "The password must be at least 6 characters long.")]
+        [DataType(DataType.Password)]
         public string Password { get; set; } = string.Empty;
 
-        public string Role { get; set; } = "Public";
+        // --- THIS FIXES THE CS1061 ERRORS ---
+        [Required]
+        [DataType(DataType.Password)]
+        [Display(Name = "Confirm Password")]
+        [Compare("Password", ErrorMessage = "The password and confirmation password do not match.")]
+        public string ConfirmPassword { get; set; } = string.Empty;
+
+        [Required]
+        public string Role { get; set; } = "User";
     }
 
     public class AuthResponse
@@ -68,12 +82,15 @@ namespace KMC.Client.Models
         [Required]
         public string Category { get; set; } = string.Empty;
 
+        [Required]
+        [Display(Name = "Event Date")]
         public DateTime EventDate { get; set; }
         public DateTime Date { get => EventDate; set => EventDate = value; }
 
         [Required]
         public string Location { get; set; } = string.Empty;
 
+        [Required]
         public int Capacity { get; set; }
         public int MaxAttendees { get => Capacity; set => Capacity = value; }
 
