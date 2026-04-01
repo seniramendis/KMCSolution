@@ -142,6 +142,17 @@ namespace KMC.Client.Controllers
             return View(events);
         }
 
+        // THIS IS THE METHOD WE ADDED!
+        public async Task<IActionResult> Attendees(int id)
+        {
+            if (HttpContext.Session.GetString("Role") != "Organizer") return RedirectToAction("Login", "Auth");
+
+            var list = await _api.GetEventAttendeesAsync(id);
+
+            ViewBag.EventId = id;
+            return View(list);
+        }
+
         // --- ATTENDEE VIEWS ---
         [HttpPost]
         public async Task<IActionResult> Register(int id)

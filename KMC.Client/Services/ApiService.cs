@@ -8,6 +8,7 @@ using System.Text.Json;
 using Microsoft.AspNetCore.Http;
 using KMC.Client.Models;
 using System.Net.Http.Json;
+using System.Threading.Tasks;
 
 namespace KMC.Client.Services
 {
@@ -202,12 +203,12 @@ namespace KMC.Client.Services
         private async Task<T?> PostAsync<T>(string url, object body, bool withAuth = false)
         {
             if (withAuth) AttachToken();
-            var content = new StringContent(System.Text.Json.JsonSerializer.Serialize(body), Encoding.UTF8, "application/json");
+            var content = new StringContent(JsonSerializer.Serialize(body), Encoding.UTF8, "application/json");
             var res = await _http.PostAsync(url, content);
 
             if (res.IsSuccessStatusCode)
             {
-                return System.Text.Json.JsonSerializer.Deserialize<T>(await res.Content.ReadAsStringAsync(), _json);
+                return JsonSerializer.Deserialize<T>(await res.Content.ReadAsStringAsync(), _json);
             }
 
             var errorMsg = await res.Content.ReadAsStringAsync();
@@ -228,16 +229,18 @@ namespace KMC.Client.Services
             if (!string.IsNullOrEmpty(token)) _http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
         }
 
+        // THE FIX: Updated the link spelling and attached the Organizer token!
         public async Task<List<AttendeeViewModel>> GetEventAttendeesAsync(int eventId)
         {
             try
             {
-                var res = await _http.GetAsync($"api/Event/{eventId}/attendees");
+                AttachToken();
+                var res = await _http.GetAsync($"api/events/{eventId}/attendees");
+
                 if (res.IsSuccessStatusCode)
                 {
                     var content = await res.Content.ReadAsStringAsync();
-                    return System.Text.Json.JsonSerializer.Deserialize<List<AttendeeViewModel>>(content,
-                        new System.Text.Json.JsonSerializerOptions { PropertyNameCaseInsensitive = true })!;
+                    return JsonSerializer.Deserialize<List<AttendeeViewModel>>(content, _json) ?? new List<AttendeeViewModel>();
                 }
                 return new List<AttendeeViewModel>();
             }
