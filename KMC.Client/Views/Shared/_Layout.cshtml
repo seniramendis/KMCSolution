@@ -9,45 +9,121 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+
+    <style>
+        /* Header specific decorations */
+        .main-header {
+            background-color: var(--theme-primary) !important;
+            border-bottom: 4px solid var(--theme-accent); /* The iconic Gold Border */
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+            padding: 1rem 0;
+            transition: all 0.3s ease;
+        }
+
+        .navbar-brand {
+            font-family: 'Georgia', serif;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            transition: transform 0.3s ease;
+        }
+
+        .navbar-brand:hover {
+            transform: scale(1.05);
+            color: #ffffff !important;
+        }
+
+        .nav-link {
+            position: relative;
+            margin: 0 10px;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+
+        /* The "Dope" underline animation on hover */
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            bottom: 0;
+            left: 0;
+            background-color: var(--theme-accent);
+            transition: width 0.3s ease;
+        }
+
+        .nav-link:hover::after {
+            width: 100%;
+        }
+
+        .nav-link:hover {
+            color: var(--theme-accent) !important;
+        }
+
+        .user-greeting {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 5px 15px;
+            border-radius: 50px;
+            border: 1px solid rgba(212, 175, 55, 0.3);
+        }
+    </style>
 </head>
 <body>
     <header>
-        <nav class="navbar navbar-expand-sm navbar-dark mb-4 py-3 shadow-sm" style="background-color: var(--theme-primary);">
+        <nav class="navbar navbar-expand-sm navbar-dark main-header">
             <div class="container">
-                <a class="navbar-brand fw-bold fs-4" asp-controller="Home" asp-action="Index" style="color: var(--theme-accent); letter-spacing: 1px;">
-                    <i class="bi bi-calendar-event me-2"></i>KMC Solution
+                <a class="navbar-brand fw-bold fs-3" asp-controller="Home" asp-action="Index" style="color: var(--theme-accent);">
+                    <i class="bi bi-fire me-2"></i>KMC Solution
                 </a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse">
+                
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
+                        aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>
+
                 <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
                     <ul class="navbar-nav flex-grow-1">
                         <li class="nav-item">
-                            <a class="nav-link text-white fw-semibold" asp-controller="Home" asp-action="Index">Home</a>
+                            <a class="nav-link text-white" asp-controller="Home" asp-action="Index">Home</a>
                         </li>
+                        @if (Context.Session.GetString("JwtToken") != null)
+                        {
+                            if (Context.Session.GetString("Role") == "Organizer")
+                            {
+                                <li class="nav-item">
+                                    <a class="nav-link text-white" asp-controller="Event" asp-action="Dashboard">Dashboard</a>
+                                </li>
+                            }
+                            else
+                            {
+                                <li class="nav-item">
+                                    <a class="nav-link text-white" asp-controller="Event" asp-action="MyRegistrations">My Tickets</a>
+                                </li>
+                            }
+                        }
                     </ul>
                     
                     <ul class="navbar-nav align-items-center">
                         @if (Context.Session.GetString("JwtToken") != null)
                         {
-                            if (Context.Session.GetString("Role") == "Organizer")
-                            {
-                                <li class="nav-item"><a class="nav-link text-white fw-semibold" asp-controller="Event" asp-action="Dashboard">Dashboard</a></li>
-                            }
-                            else
-                            {
-                                <li class="nav-item"><a class="nav-link text-white fw-semibold" asp-controller="Event" asp-action="MyRegistrations">My Tickets</a></li>
-                            }
-                            <li class="nav-item ms-3">
-                                <span class="text-white me-3">Ayubowan, <span style="color: var(--theme-accent); font-weight: bold;">@Context.Session.GetString("FullName")</span></span>
-                                <a class="btn btn-outline-light btn-sm rounded-pill px-3" asp-controller="Auth" asp-action="Logout">Logout</a>
+                            <li class="nav-item me-3">
+                                <div class="user-greeting">
+                                    <span class="text-white small">Ayubowan, </span>
+                                    <span style="color: var(--theme-accent); font-weight: bold;">@Context.Session.GetString("FullName")</span>
+                                </div>
+                            </li>
+                            <li class="nav-item">
+                                <a class="btn btn-outline-light btn-sm rounded-pill px-4" asp-controller="Auth" asp-action="Logout">Logout</a>
                             </li>
                         }
                         else
                         {
-                            <li class="nav-item"><a class="nav-link text-white fw-semibold" asp-controller="Auth" asp-action="Login">Login</a></li>
+                            <li class="nav-item">
+                                <a class="nav-link text-white" asp-controller="Auth" asp-action="Login">Login</a>
+                            </li>
                             <li class="nav-item ms-2">
-                                <a class="btn btn-sm rounded-pill px-4 fw-bold shadow-sm" style="background-color: var(--theme-accent); color: var(--theme-primary);" asp-controller="Auth" asp-action="Register">Get Started</a>
+                                <a class="btn btn-sm rounded-pill px-4 fw-bold shadow-sm" 
+                                   style="background-color: var(--theme-accent); color: var(--theme-primary); border: 2px solid var(--theme-accent);" 
+                                   asp-controller="Auth" asp-action="Register">Get Started</a>
                             </li>
                         }
                     </ul>
@@ -56,7 +132,7 @@
         </nav>
     </header>
 
-    <div class="container">
+    <div class="container mt-4">
         <main role="main" class="pb-5">
             @RenderBody()
         </main>
