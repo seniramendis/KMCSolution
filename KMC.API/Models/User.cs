@@ -8,16 +8,16 @@ namespace KMC.API.Models
         public int UserId { get; set; }
 
         [Required]
-        public string FullName { get; set; }
+        public string FullName { get; set; } = string.Empty;
 
         [Required]
         [EmailAddress]
-        public string Email { get; set; }
+        public string Email { get; set; } = string.Empty;
 
         [Required]
-        public string PasswordHash { get; set; }
+        public string PasswordHash { get; set; } = string.Empty;
 
         [Required]
-        public string Role { get; set; } // "Public", "Organizer", "Admin"
+        public string Role { get; set; } = string.Empty; // "Public", "Organizer", "Admin"
     }
 }

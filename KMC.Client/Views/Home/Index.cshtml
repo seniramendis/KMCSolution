@@ -11,10 +11,10 @@
         <div class="col-auto">
             <select name="category" class="form-select">
                 <option value="">All Categories</option>
-                <option value="Music">Music</option>
-                <option value="Sports">Sports</option>
-                <option value="Culture">Culture</option>
-                <option value="Business">Business</option>
+                <option value="Music" selected="@(ViewBag.Category == "Music" ? "selected" : null)">Music</option>
+                <option value="Sports" selected="@(ViewBag.Category == "Sports" ? "selected" : null)">Sports</option>
+                <option value="Culture" selected="@(ViewBag.Category == "Culture" ? "selected" : null)">Culture</option>
+                <option value="Business" selected="@(ViewBag.Category == "Business" ? "selected" : null)">Business</option>
             </select>
         </div>
         <div class="col-auto">
@@ -65,7 +65,7 @@
                             <h4 class="card-title fw-bold">@ev.Title</h4>
                             
                             <div class="mt-3 text-muted">
-                                <p class="mb-1"><strong><i class="bi bi-calendar"></i> Date:</strong> @ev.EventDate.ToString("MMM dd, yyyy - HH:mm")</p>
+                                <p class="mb-1"><strong><i class="bi bi-calendar"></i> Date:</strong> @ev.EventDate.ToString("MMM dd, yyyy 'at' h:mm tt")</p>
                                 <p class="mb-0"><strong><i class="bi bi-geo-alt"></i> Location:</strong> @ev.Location</p>
                             </div>
                         </div>

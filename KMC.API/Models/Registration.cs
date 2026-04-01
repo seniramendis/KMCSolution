@@ -8,8 +8,10 @@ namespace KMC.API.Models
         [Key]
         public int RegistrationId { get; set; }
 
-        public int UserId { get; set; }
         public int EventId { get; set; }
-        public DateTime RegisteredAt { get; set; } = DateTime.UtcNow;
+
+        public int UserId { get; set; }
+
+        public DateTime RegistrationDate { get; set; } = DateTime.UtcNow;
     }
 }

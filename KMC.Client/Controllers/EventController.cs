@@ -12,7 +12,7 @@ namespace KMC.Client.Controllers
     public class EventController : Controller
     {
         private readonly ApiService _api;
-        private readonly IWebHostEnvironment _env; // NEW: Gives us access to the wwwroot folder
+        private readonly IWebHostEnvironment _env;
 
         public EventController(ApiService api, IWebHostEnvironment env)
         {
@@ -36,20 +36,32 @@ namespace KMC.Client.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Create(CreateEventViewModel model)
+        public async Task<IActionResult> Create(CreateEventViewModel model, IFormFile? imageFile)
         {
             if (HttpContext.Session.GetString("Role") != "Organizer") return RedirectToAction("Login", "Auth");
 
             try
             {
-                // NO IMAGES. Just send the raw text straight to the API!
-                var result = await _api.CreateEventAsync(model);
-
-                if (result == null)
+                if (imageFile != null && imageFile.Length > 0)
                 {
-                    ViewBag.Error = "Failed to create event.";
-                    return View(model);
+                    string webRootPath = _env.WebRootPath ?? Path.Combine(Directory.GetCurrentDirectory(), "wwwroot");
+                    string uploadsFolder = Path.Combine(webRootPath, "uploads");
+
+                    if (!Directory.Exists(uploadsFolder)) Directory.CreateDirectory(uploadsFolder);
+
+                    string uniqueFileName = Guid.NewGuid().ToString() + "_" + imageFile.FileName;
+                    string filePath = Path.Combine(uploadsFolder, uniqueFileName);
+
+                    using (var fileStream = new FileStream(filePath, FileMode.Create))
+                    {
+                        await imageFile.CopyToAsync(fileStream);
+                    }
+
+                    model.ImageUrl = "/uploads/" + uniqueFileName;
                 }
+
+                var result = await _api.CreateEventAsync(model);
+                if (result == null) { ViewBag.Error = "Failed to create event."; return View(model); }
 
                 return RedirectToAction("Dashboard");
             }
@@ -60,13 +72,50 @@ namespace KMC.Client.Controllers
             }
         }
 
+        public async Task<IActionResult> Edit(int id)
+        {
+            if (HttpContext.Session.GetString("Role") != "Organizer") return RedirectToAction("Login", "Auth");
+            var ev = await _api.GetEventAsync(id);
+            if (ev == null) return NotFound();
+
+            ViewBag.EventId = id;
+            return View(new CreateEventViewModel
+            {
+                Title = ev.Title,
+                Description = ev.Description,
+                Category = ev.Category,
+                Location = ev.Location,
+                EventDate = ev.EventDate,
+                Capacity = ev.Capacity,
+                ImageUrl = ev.ImageUrl
+            });
+        }
+
         [HttpPost]
-        public async Task<IActionResult> Edit(int id, CreateEventViewModel model)
+        public async Task<IActionResult> Edit(int id, CreateEventViewModel model, IFormFile? imageFile)
         {
             if (HttpContext.Session.GetString("Role") != "Organizer") return RedirectToAction("Login", "Auth");
 
             try
             {
+                if (imageFile != null && imageFile.Length > 0)
+                {
+                    string webRootPath = _env.WebRootPath ?? Path.Combine(Directory.GetCurrentDirectory(), "wwwroot");
+                    string uploadsFolder = Path.Combine(webRootPath, "uploads");
+
+                    if (!Directory.Exists(uploadsFolder)) Directory.CreateDirectory(uploadsFolder);
+
+                    string uniqueFileName = Guid.NewGuid().ToString() + "_" + imageFile.FileName;
+                    string filePath = Path.Combine(uploadsFolder, uniqueFileName);
+
+                    using (var fileStream = new FileStream(filePath, FileMode.Create))
+                    {
+                        await imageFile.CopyToAsync(fileStream);
+                    }
+
+                    model.ImageUrl = "/uploads/" + uniqueFileName;
+                }
+
                 var result = await _api.UpdateEventAsync(id, model);
                 if (result == null) { ViewBag.Error = "Failed to update event."; ViewBag.EventId = id; return View(model); }
                 return RedirectToAction("Dashboard");
@@ -78,6 +127,7 @@ namespace KMC.Client.Controllers
                 return View(model);
             }
         }
+
         [HttpPost]
         public async Task<IActionResult> Delete(int id)
         {
@@ -106,6 +156,7 @@ namespace KMC.Client.Controllers
         [HttpPost]
         public async Task<IActionResult> Cancel(int id)
         {
+            if (string.IsNullOrEmpty(HttpContext.Session.GetString("JwtToken"))) return RedirectToAction("Login", "Auth");
             await _api.CancelRegistrationAsync(id);
             return RedirectToAction("MyRegistrations");
         }

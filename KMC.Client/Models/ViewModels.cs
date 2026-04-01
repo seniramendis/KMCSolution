@@ -87,7 +87,9 @@ namespace KMC.Client.Models
     {
         public int RegistrationId { get; set; }
         public int EventId { get; set; }
-        public string EventTitle { get; set; } = string.Empty;
+        public string Title { get; set; } = string.Empty;
+        public string OrganizerName { get; set; } = string.Empty;
+        public string Location { get; set; } = string.Empty;
         public DateTime EventDate { get; set; }
         public DateTime RegistrationDate { get; set; }
     }

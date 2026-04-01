@@ -45,12 +45,11 @@ namespace KMC.API.Controllers
             return Ok(new { message = "Event created successfully!" });
         }
 
-        // NEW: Automatically attaches the Organizer's Full Name!
         [HttpGet("{id}")]
         public IActionResult GetEvent(int id)
         {
             var ev = (from e in _context.Events
-                      join u in _context.Users on e.OrganizerId equals u.UserId // FIX: Changed to u.UserId
+                      join u in _context.Users on e.OrganizerId equals u.UserId
                       where e.EventId == id
                       select new
                       {
@@ -69,29 +68,37 @@ namespace KMC.API.Controllers
             return Ok(ev);
         }
 
-        // NEW: Automatically attaches names to the public feed!
+        // UPGRADED: Now accepts search filters from the website!
         [HttpGet]
-        public IActionResult GetAllEvents()
+        public IActionResult GetAllEvents([FromQuery] string? category, [FromQuery] DateTime? date, [FromQuery] string? location)
         {
-            var events = (from e in _context.Events
-                          join u in _context.Users on e.OrganizerId equals u.UserId // FIX: Changed to u.UserId
-                          select new
-                          {
-                              e.EventId,
-                              e.Title,
-                              e.Description,
-                              e.Category,
-                              e.EventDate,
-                              e.Location,
-                              e.Capacity,
-                              e.ImageUrl,
-                              OrganizerName = u.FullName
-                          }).ToList();
+            var query = from e in _context.Events
+                        join u in _context.Users on e.OrganizerId equals u.UserId
+                        select new
+                        {
+                            e.EventId,
+                            e.Title,
+                            e.Description,
+                            e.Category,
+                            e.EventDate,
+                            e.Location,
+                            e.Capacity,
+                            e.ImageUrl,
+                            OrganizerName = u.FullName
+                        };
 
-            return Ok(events);
+            if (!string.IsNullOrEmpty(category))
+                query = query.Where(e => e.Category == category);
+
+            if (date.HasValue)
+                query = query.Where(e => e.EventDate.Date == date.Value.Date);
+
+            if (!string.IsNullOrEmpty(location))
+                query = query.Where(e => e.Location.Contains(location));
+
+            return Ok(query.ToList());
         }
 
-        // NEW: Automatically attaches names to your Dashboard!
         [HttpGet("my")]
         [Authorize]
         public IActionResult GetMyEvents()
@@ -100,7 +107,7 @@ namespace KMC.API.Controllers
             if (organizerId == 0) return Unauthorized("Invalid user ID.");
 
             var myEvents = (from e in _context.Events
-                            join u in _context.Users on e.OrganizerId equals u.UserId // FIX: Changed to u.UserId
+                            join u in _context.Users on e.OrganizerId equals u.UserId
                             where e.OrganizerId == organizerId
                             select new
                             {

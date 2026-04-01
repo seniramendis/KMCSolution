@@ -9,10 +9,8 @@ using Microsoft.AspNetCore.Http;
 using KMC.Client.Models;
 using System.Net.Http.Json;
 
-
 namespace KMC.Client.Services
 {
-
     public class ApiService
     {
         private readonly HttpClient _http;
@@ -31,13 +29,11 @@ namespace KMC.Client.Services
             try
             {
                 var res = await _http.PostAsJsonAsync("api/Auth/login", model);
-
                 if (res.IsSuccessStatusCode)
                 {
                     var content = await res.Content.ReadAsStringAsync();
                     return JsonSerializer.Deserialize<AuthResponse>(content, _json);
                 }
-
                 var errorMsg = await res.Content.ReadAsStringAsync();
                 throw new Exception($"API Rejected: {errorMsg}");
             }
@@ -52,13 +48,11 @@ namespace KMC.Client.Services
             try
             {
                 var res = await _http.PostAsJsonAsync("api/Auth/register", model);
-
                 if (res.IsSuccessStatusCode)
                 {
                     var content = await res.Content.ReadAsStringAsync();
                     return JsonSerializer.Deserialize<AuthResponse>(content, _json);
                 }
-
                 var errorMsg = await res.Content.ReadAsStringAsync();
                 throw new Exception(errorMsg);
             }
@@ -67,13 +61,20 @@ namespace KMC.Client.Services
                 throw new Exception("CONNECTION ERROR: Cannot reach the API. Are both projects running?");
             }
         }
+
         // --- Events ---
         public async Task<List<EventViewModel>> GetEventsAsync(string? category = null, DateTime? date = null, string? location = null)
         {
             try
             {
-                var query = BuildQuery(new Dictionary<string, string?> { ["category"] = category, ["date"] = date?.ToString("yyyy-MM-dd"), ["location"] = location });
-                return await GetAsync<List<EventViewModel>>($"api/events{query}") ?? new();
+                var url = "api/events?";
+                if (!string.IsNullOrEmpty(category)) url += $"category={Uri.EscapeDataString(category)}&";
+                if (date.HasValue) url += $"date={date.Value.ToString("yyyy-MM-dd")}&";
+                if (!string.IsNullOrEmpty(location)) url += $"location={Uri.EscapeDataString(location)}";
+
+                url = url.TrimEnd('&', '?');
+
+                return await GetAsync<List<EventViewModel>>(url) ?? new List<EventViewModel>();
             }
             catch (HttpRequestException)
             {
@@ -209,7 +210,6 @@ namespace KMC.Client.Services
                 return System.Text.Json.JsonSerializer.Deserialize<T>(await res.Content.ReadAsStringAsync(), _json);
             }
 
-            // UNMASKS THE ERROR: This grabs the exact complaint from the API
             var errorMsg = await res.Content.ReadAsStringAsync();
             throw new Exception($"API REJECTED IT: {errorMsg}");
         }
@@ -228,12 +228,6 @@ namespace KMC.Client.Services
             if (!string.IsNullOrEmpty(token)) _http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
         }
 
-        private static string BuildQuery(Dictionary<string, string?> params_)
-        {
-            var parts = params_.Where(p => !string.IsNullOrEmpty(p.Value)).Select(p => $"{p.Key}={Uri.EscapeDataString(p.Value!)}");
-            var q = string.Join("&", parts);
-            return string.IsNullOrEmpty(q) ? "" : "?" + q;
-        }
         public async Task<List<AttendeeViewModel>> GetEventAttendeesAsync(int eventId)
         {
             try
@@ -253,6 +247,7 @@ namespace KMC.Client.Services
             }
         }
     }
+
     public class AttendeeViewModel
     {
         public string FullName { get; set; } = string.Empty;
