@@ -201,9 +201,17 @@ namespace KMC.Client.Services
         private async Task<T?> PostAsync<T>(string url, object body, bool withAuth = false)
         {
             if (withAuth) AttachToken();
-            var content = new StringContent(JsonSerializer.Serialize(body), Encoding.UTF8, "application/json");
+            var content = new StringContent(System.Text.Json.JsonSerializer.Serialize(body), Encoding.UTF8, "application/json");
             var res = await _http.PostAsync(url, content);
-            return res.IsSuccessStatusCode ? JsonSerializer.Deserialize<T>(await res.Content.ReadAsStringAsync(), _json) : default;
+
+            if (res.IsSuccessStatusCode)
+            {
+                return System.Text.Json.JsonSerializer.Deserialize<T>(await res.Content.ReadAsStringAsync(), _json);
+            }
+
+            // UNMASKS THE ERROR: This grabs the exact complaint from the API
+            var errorMsg = await res.Content.ReadAsStringAsync();
+            throw new Exception($"API REJECTED IT: {errorMsg}");
         }
 
         private async Task<T?> PutAsync<T>(string url, object body, bool withAuth = false)
