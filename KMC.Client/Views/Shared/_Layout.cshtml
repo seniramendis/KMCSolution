@@ -10,46 +10,44 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
 </head>
-<body class="bg-light">
+<body>
     <header>
-        <nav class="navbar navbar-expand-sm navbar-light bg-white border-bottom box-shadow mb-4 py-3">
+        <nav class="navbar navbar-expand-sm navbar-dark mb-4 py-3 shadow-sm" style="background-color: var(--theme-primary);">
             <div class="container">
-                <a class="navbar-brand fw-bold text-primary fs-4" asp-controller="Home" asp-action="Index">
-                    <i class="bi bi-calendar-event"></i> KMC Events
+                <a class="navbar-brand fw-bold fs-4" asp-controller="Home" asp-action="Index" style="color: var(--theme-accent); letter-spacing: 1px;">
+                    <i class="bi bi-calendar-event me-2"></i>KMC Solution
                 </a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse">
                     <span class="navbar-toggler-icon"></span>
                 </button>
-                
                 <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
                     <ul class="navbar-nav flex-grow-1">
                         <li class="nav-item">
-                            <a class="nav-link fw-semibold" asp-controller="Home" asp-action="Index">Home</a>
+                            <a class="nav-link text-white fw-semibold" asp-controller="Home" asp-action="Index">Home</a>
                         </li>
                     </ul>
                     
-                    <ul class="navbar-nav">
+                    <ul class="navbar-nav align-items-center">
                         @if (Context.Session.GetString("JwtToken") != null)
                         {
                             if (Context.Session.GetString("Role") == "Organizer")
                             {
-                                <li class="nav-item"><a class="nav-link fw-semibold text-dark" asp-controller="Event" asp-action="Dashboard">My Dashboard</a></li>
+                                <li class="nav-item"><a class="nav-link text-white fw-semibold" asp-controller="Event" asp-action="Dashboard">Dashboard</a></li>
                             }
                             else
                             {
-                                <li class="nav-item"><a class="nav-link fw-semibold text-dark" asp-controller="Event" asp-action="MyRegistrations">My Tickets</a></li>
+                                <li class="nav-item"><a class="nav-link text-white fw-semibold" asp-controller="Event" asp-action="MyRegistrations">My Tickets</a></li>
                             }
                             <li class="nav-item ms-3">
-                                <a class="btn btn-outline-danger btn-sm mt-1" asp-controller="Auth" asp-action="Logout">
-                                    <i class="bi bi-box-arrow-right"></i> Logout (@Context.Session.GetString("FullName"))
-                                </a>
+                                <span class="text-white me-3">Ayubowan, <span style="color: var(--theme-accent); font-weight: bold;">@Context.Session.GetString("FullName")</span></span>
+                                <a class="btn btn-outline-light btn-sm rounded-pill px-3" asp-controller="Auth" asp-action="Logout">Logout</a>
                             </li>
                         }
                         else
                         {
-                            <li class="nav-item"><a class="nav-link fw-semibold" asp-controller="Auth" asp-action="Login">Login</a></li>
+                            <li class="nav-item"><a class="nav-link text-white fw-semibold" asp-controller="Auth" asp-action="Login">Login</a></li>
                             <li class="nav-item ms-2">
-                                <a class="btn btn-primary btn-sm mt-1 px-3" asp-controller="Auth" asp-action="Register">Get Started</a>
+                                <a class="btn btn-sm rounded-pill px-4 fw-bold shadow-sm" style="background-color: var(--theme-accent); color: var(--theme-primary);" asp-controller="Auth" asp-action="Register">Get Started</a>
                             </li>
                         }
                     </ul>
