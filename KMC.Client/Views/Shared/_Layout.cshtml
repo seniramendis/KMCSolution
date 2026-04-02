@@ -9,32 +9,105 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <style>
-        /* Pushes the page content down so it doesn't hide behind the floating header */
+        /* Forces the page to take at least the full height of the screen, pushing the footer down */
+        html, body {
+            height: 100%;
+        }
         body {
             padding-top: 85px; 
+            display: flex;
+            flex-direction: column;
+        }
+        
+        main {
+            flex: 1 0 auto; /* Pushes the footer to the bottom when page content is short */
         }
 
+        /* HEADER CSS */
         .main-header {
             background-color: var(--theme-primary) !important;
             border-bottom: 4px solid var(--theme-accent);
             box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
         }
-        
         .navbar-brand {
             font-family: 'Georgia', serif;
             letter-spacing: 2px;
             text-transform: uppercase;
-            /* Removed the border-left and padding-left from here */
         }
-        
         .nav-link { font-weight: 500; margin: 0 10px; }
         .nav-link:hover { color: var(--theme-accent) !important; }
-        
         .user-capsule {
             background: rgba(255, 255, 255, 0.1);
             border: 1px solid rgba(212, 175, 55, 0.3);
             padding: 5px 15px;
             border-radius: 50px;
+        }
+
+        /* PREMIUM FOOTER CSS */
+        .footer-custom {
+            background-color: var(--theme-primary);
+            color: #e0e0e0;
+            padding: 4rem 0 0 0;
+            margin-top: 5rem;
+            border-top: 4px solid var(--theme-accent);
+            flex-shrink: 0;
+        }
+        .footer-brand {
+            font-family: 'Georgia', serif;
+            letter-spacing: 2px;
+            color: var(--theme-accent);
+            font-weight: bold;
+        }
+        .footer-brand span { color: #ffffff; }
+        .footer-text { font-size: 0.95rem; line-height: 1.7; opacity: 0.85; }
+        
+        .footer-heading {
+            color: var(--theme-accent);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            font-size: 0.9rem;
+        }
+        .footer-links { list-style: none; padding: 0; margin: 0; }
+        .footer-links li { margin-bottom: 0.8rem; }
+        .footer-links a {
+            color: #e0e0e0;
+            text-decoration: none;
+            transition: color 0.3s ease, padding-left 0.3s ease;
+        }
+        .footer-links a:hover { 
+            color: var(--theme-accent); 
+            padding-left: 5px; /* Slight slide animation on hover */
+        }
+        
+        .social-icons a {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(212, 175, 55, 0.2);
+            color: var(--theme-accent);
+            margin-right: 10px;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+        .social-icons a:hover {
+            background: var(--theme-accent);
+            color: var(--theme-primary);
+            transform: translateY(-3px);
+        }
+        
+        .footer-bottom {
+            border-top: 1px solid rgba(255,255,255,0.1);
+            padding: 1.5rem 0;
+            margin-top: 3rem;
+            text-align: center;
+            font-size: 0.85rem;
+            opacity: 0.6;
         }
     </style>
 </head>
@@ -53,6 +126,14 @@
                         <li class="nav-item"><a class="nav-link text-white" asp-controller="Home" asp-action="Index">Home</a></li>
                         <li class="nav-item"><a class="nav-link text-white" asp-controller="Home" asp-action="About">About Us</a></li>
                         <li class="nav-item"><a class="nav-link text-white" asp-controller="Home" asp-action="Contact">Contact</a></li>
+                        
+                        @if (Context.Session.GetString("JwtToken") != null) {
+                            <li class="nav-item">
+                                <a class="nav-link fw-bold" style="color: var(--theme-accent);" asp-controller="Event" asp-action="@(Context.Session.GetString("Role") == "Organizer" ? "Dashboard" : "MyRegistrations")">
+                                    @(Context.Session.GetString("Role") == "Organizer" ? "Dashboard" : "My Tickets")
+                                </a>
+                            </li>
+                        }
                     </ul>
                     <ul class="navbar-nav align-items-center">
                         @if (Context.Session.GetString("JwtToken") != null) {
@@ -75,11 +156,52 @@
             </div>
         </nav>
     </header>
-    <div class="container mt-4">
-        <main role="main">
-            @RenderBody()
-        </main>
-    </div>
+
+    <main role="main" class="container">
+        @RenderBody()
+    </main>
+
+    <footer class="footer-custom">
+        <div class="container">
+            <div class="row g-4">
+                <div class="col-lg-5 pe-lg-5">
+                    <h4 class="footer-brand mb-3">KMC <span>SOLUTION</span></h4>
+                    <p class="footer-text">
+                        The digital guardian of Kandyan heritage. Bridging ancient traditions with modern technology to provide seamless, unforgettable cultural experiences in the heart of Sri Lanka.
+                    </p>
+                </div>
+                
+                <div class="col-lg-3 offset-lg-1">
+                    <h6 class="footer-heading">Explore</h6>
+                    <ul class="footer-links">
+                        <li><a asp-controller="Home" asp-action="Index">Discover Events</a></li>
+                        <li><a asp-controller="Home" asp-action="About">Our Story</a></li>
+                        <li><a asp-controller="Home" asp-action="Contact">Get in Touch</a></li>
+                        @if (Context.Session.GetString("JwtToken") == null) {
+                            <li><a asp-controller="Auth" asp-action="Register">Create an Account</a></li>
+                        }
+                    </ul>
+                </div>
+                
+                <div class="col-lg-3">
+                    <h6 class="footer-heading">Connect With Us</h6>
+                    <div class="social-icons mt-3 mb-4">
+                        <a href="#" title="Facebook"><i class="bi bi-facebook"></i></a>
+                        <a href="#" title="Instagram"><i class="bi bi-instagram"></i></a>
+                        <a href="#" title="Twitter / X"><i class="bi bi-twitter-x"></i></a>
+                    </div>
+                    <p class="footer-text mb-0">
+                        <i class="bi bi-envelope me-2"></i> info@kmcsolution.com
+                    </p>
+                </div>
+            </div>
+            
+            <div class="footer-bottom">
+                <p class="mb-0">&copy; @DateTime.Now.Year KMC Solution. All rights reserved. Crafted in Kandy.</p>
+            </div>
+        </div>
+    </footer>
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     @await RenderSectionAsync("Scripts", required: false)
 </body>

@@ -1,34 +1,96 @@
-﻿@{ ViewData["Title"] = "Contact Us"; }
+﻿@{
+    ViewData["Title"] = "Contact";
+}
 
-<div class="container py-5">
-    <div class="text-center mb-5">
-        <h1 class="display-4 fw-bold" style="color: var(--theme-primary); font-family: 'Georgia', serif;">Get In Touch</h1>
-        <p class="text-muted">Have questions? Our team is here to support you.</p>
-    </div>
+<style>
+    /* High-end Editorial Aesthetic */
+    .contact-wrapper {
+        padding: 6rem 0;
+    }
+
+    .contact-hero {
+        font-family: 'Georgia', serif;
+        font-size: clamp(3rem, 5vw, 4.5rem);
+        line-height: 1.1;
+        color: var(--theme-primary);
+        letter-spacing: -1px;
+        margin-bottom: 4rem;
+    }
     
-    <div class="row justify-content-center">
-        <div class="col-md-8">
-            <div class="card border-0 shadow-sm p-4 rounded-4" style="background: #ffffff;">
-                <form>
-                    <div class="row g-3">
-                        <div class="col-md-6">
-                            <label class="form-label fw-bold">Full Name</label>
-                            <input type="text" class="form-control rounded-pill px-3" placeholder="Your Name">
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label fw-bold">Email Address</label>
-                            <input type="email" class="form-control rounded-pill px-3" placeholder="Email@example.com">
-                        </div>
-                        <div class="col-12">
-                            <label class="form-label fw-bold">Message</label>
-                            <textarea class="form-control rounded-4 px-3" rows="5" placeholder="How can we help you?"></textarea>
-                        </div>
-                        <div class="col-12 text-center mt-4">
-                            <button type="button" class="btn btn-primary px-5 py-2 fw-bold shadow-sm">Send Message</button>
-                        </div>
-                    </div>
-                </form>
+    .contact-label {
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 3px;
+        color: var(--theme-accent);
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+        display: block;
+    }
+
+    .contact-detail {
+        font-size: 1.3rem;
+        color: #222;
+        font-weight: 500;
+        margin-bottom: 2.5rem;
+    }
+
+    .contact-link {
+        color: #222;
+        text-decoration: none;
+        border-bottom: 2px solid transparent;
+        transition: border-color 0.3s ease, color 0.3s ease;
+    }
+
+    .contact-link:hover {
+        color: var(--theme-primary);
+        border-color: var(--theme-accent);
+    }
+
+    /* Sharp, brutalist-style image panel */
+    .image-panel {
+        height: 650px;
+        border-radius: 0; /* Sharp edges look more custom/editorial */
+        background: url('https://winningtours.lk/wp-content/uploads/2025/03/templeoftooth.jpg') center/cover no-repeat;
+        box-shadow: -20px 20px 0px rgba(212, 175, 55, 0.4); /* Solid Gold offset shadow instead of a soft blur */
+    }
+</style>
+
+<div class="container contact-wrapper">
+    <div class="row align-items-center g-5">
+        
+        <div class="col-lg-5 pe-lg-5">
+            <h1 class="contact-hero fw-bold">Let's talk<br>culture.</h1>
+            
+            <div class="contact-info-block">
+                <div>
+                    <span class="contact-label">Drop a line</span>
+                    <p class="contact-detail">
+                        <a href="mailto:info@kmcsolution.com" class="contact-link">info@kmcsolution.com</a>
+                    </p>
+                </div>
+
+                <div>
+                    <span class="contact-label">Give us a ring</span>
+                    <p class="contact-detail">
+                        <a href="tel:+94753356254" class="contact-link">+94 75 335 6254</a>
+                    </p>
+                </div>
+
+                <div>
+                    <span class="contact-label">Headquarters</span>
+                    <p class="contact-detail" style="line-height: 1.4;">
+                        Governor’s Residence,<br>
+                        Sri Dalada Thapowana Vihara Rd,<br>
+                        Kandy<br />
+                        Sri Lanka
+                    </p>
+                </div>
             </div>
         </div>
+
+        <div class="col-lg-7">
+            <div class="image-panel w-100"></div>
+        </div>
+        
     </div>
 </div>
