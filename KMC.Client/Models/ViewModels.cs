@@ -3,9 +3,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace KMC.Client.Models
 {
-    // ==========================================
-    // 1. AUTHENTICATION MODELS
-    // ==========================================
+    
     public class LoginViewModel
     {
         [Required]
@@ -32,7 +30,7 @@ namespace KMC.Client.Models
         [DataType(DataType.Password)]
         public string Password { get; set; } = string.Empty;
 
-        // --- THIS FIXES THE CS1061 ERRORS ---
+        
         [Required]
         [DataType(DataType.Password)]
         [Display(Name = "Confirm Password")]
@@ -50,9 +48,7 @@ namespace KMC.Client.Models
         public string? Role { get; set; }
     }
 
-    // ==========================================
-    // 2. EVENT MODELS
-    // ==========================================
+    
     public class EventViewModel
     {
         public int EventId { get; set; }
@@ -97,9 +93,7 @@ namespace KMC.Client.Models
         public string? ImageUrl { get; set; }
     }
 
-    // ==========================================
-    // 3. REGISTRATION MODELS
-    // ==========================================
+    
     public class RegistrationViewModel
     {
         public int RegistrationId { get; set; }

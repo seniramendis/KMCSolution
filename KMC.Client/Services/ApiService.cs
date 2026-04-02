@@ -24,7 +24,7 @@ namespace KMC.Client.Services
             _ctx = ctx;
         }
 
-        // --- Auth ---
+        
         public async Task<AuthResponse?> LoginAsync(LoginViewModel model)
         {
             try
@@ -63,7 +63,7 @@ namespace KMC.Client.Services
             }
         }
 
-        // --- Events ---
+        
         public async Task<List<EventViewModel>> GetEventsAsync(string? category = null, DateTime? date = null, string? location = null)
         {
             try
@@ -145,7 +145,7 @@ namespace KMC.Client.Services
             }
         }
 
-        // --- Registrations ---
+        
         public async Task<(bool Success, string Message)> RegisterForEventAsync(int eventId)
         {
             try
@@ -192,7 +192,7 @@ namespace KMC.Client.Services
             }
         }
 
-        // --- Helpers ---
+        
         private async Task<T?> GetAsync<T>(string url, bool withAuth = false)
         {
             if (withAuth) AttachToken();
@@ -229,7 +229,7 @@ namespace KMC.Client.Services
             if (!string.IsNullOrEmpty(token)) _http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
         }
 
-        // THE FIX: Updated the link spelling and attached the Organizer token!
+        
         public async Task<List<AttendeeViewModel>> GetEventAttendeesAsync(int eventId)
         {
             try

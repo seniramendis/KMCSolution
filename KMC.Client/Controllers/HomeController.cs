@@ -27,13 +27,13 @@ namespace KMC.Client.Controllers
             }
         }
 
-        // New Action for About Page
+        
         public IActionResult About()
         {
             return View();
         }
 
-        // New Action for Contact Page
+        
         public IActionResult Contact()
         {
             return View();

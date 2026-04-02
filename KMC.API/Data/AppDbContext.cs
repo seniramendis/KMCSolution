@@ -15,7 +15,7 @@ namespace KMC.API.Data
         {
             base.OnModelCreating(modelBuilder);
 
-            // This prevents duplicate accounts by forcing emails to be unique
+            
             modelBuilder.Entity<User>()
                 .HasIndex(u => u.Email)
                 .IsUnique();

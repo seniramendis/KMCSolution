@@ -5,7 +5,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllersWithViews();
 builder.Services.AddHttpContextAccessor();
 
-// Session for storing JWT token
+
 builder.Services.AddSession(options =>
 {
     options.IdleTimeout = TimeSpan.FromHours(8);
@@ -13,10 +13,10 @@ builder.Services.AddSession(options =>
     options.Cookie.IsEssential = true;
 });
 
-// HttpClient pointing at the API
+
 builder.Services.AddHttpClient<ApiService>(client =>
 {
-    // Make sure this port matches your KMC.API launchSettings.json!
+    
     client.BaseAddress = new Uri("http://localhost:5085/");
 });
 
@@ -32,7 +32,7 @@ app.UseHttpsRedirection();
 app.UseStaticFiles();
 app.UseRouting();
 
-app.UseSession(); // Must be before Authorization
+app.UseSession(); 
 app.UseAuthorization();
 
 app.MapControllerRoute(

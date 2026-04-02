@@ -14,11 +14,11 @@ namespace KMC.API
 
             builder.Services.AddControllers();
 
-            // Database Configuration
+            
             builder.Services.AddDbContext<AppDbContext>(options =>
                 options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-            // JWT Authentication Configuration
+            
             var jwtSettings = builder.Configuration.GetSection("Jwt");
             var keyString = jwtSettings["Key"] ?? "ThisIsADefaultSecretKeyThatNeedsToBeAtLeast32CharactersLong!";
             var key = Encoding.ASCII.GetBytes(keyString);
@@ -55,7 +55,7 @@ namespace KMC.API
 
             app.UseHttpsRedirection();
 
-            // MUST be in this order: Authentication then Authorization
+            
             app.UseAuthentication();
             app.UseAuthorization();
 

@@ -1,13 +1,13 @@
 ﻿@model IEnumerable<KMC.Client.Models.EventViewModel>
 @{ 
     ViewData["Title"] = "Organizer Dashboard"; 
-    // Quick Stats Calculation
+    
     var totalEvents = Model.Count();
     var totalRegistrations = Model.Sum(e => e.RegisteredCount);
 }
 
 <style>
-    /* Premium KPI Cards */
+    
     .kpi-card {
         border: none;
         border-radius: 1.5rem;
@@ -32,7 +32,7 @@
         font-size: 1.5rem;
     }
 
-    /* Enhanced Table styling */
+    
     .event-table thead {
         background-color: var(--theme-primary);
         color: white;
@@ -179,7 +179,7 @@
 
 @section Scripts {
     <script>
-        // Simple search filter
+        
         document.getElementById('dashboardSearch').addEventListener('keyup', function() {
             let filter = this.value.toLowerCase();
             let rows = document.querySelectorAll('.event-row');

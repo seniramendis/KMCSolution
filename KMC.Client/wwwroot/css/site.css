@@ -1,10 +1,10 @@
-/* --- GLOBAL COLOR PALETTE --- */
+
 :root {
-    --theme-bg: #FDF8F5; /* Warm earthy background */
-    --theme-primary: #8B0000; /* Deep Maroon/Red */
-    --theme-accent: #D4AF37; /* Gold */
-    --theme-text: #2b2b2b; /* Dark text */
-    --theme-card: #ffffff; /* White for cards */
+    --theme-bg: #FDF8F5; 
+    --theme-primary: #8B0000; 
+    --theme-accent: #D4AF37; 
+    --theme-text: #2b2b2b; 
+    --theme-card: #ffffff; 
 }
 
 html {
@@ -36,7 +36,7 @@ a {
         color: var(--theme-accent);
     }
 
-/* Global Button Styles */
+
 .btn-primary {
     background-color: var(--theme-primary);
     border-color: var(--theme-primary);
@@ -54,7 +54,7 @@ a {
     }
 
 .btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
-    box-shadow: 0 0 0 0.25rem rgba(212, 175, 55, 0.3); /* Gold focus ring */
+    box-shadow: 0 0 0 0.25rem rgba(212, 175, 55, 0.3); 
     border-color: var(--theme-accent);
 }
 

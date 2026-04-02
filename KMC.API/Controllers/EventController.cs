@@ -63,7 +63,7 @@ namespace KMC.API.Controllers
                           e.Capacity,
                           e.ImageUrl,
                           OrganizerName = u.FullName,
-                          // The count has been added here!
+                          
                           RegisteredCount = _context.Registrations.Count(r => r.EventId == e.EventId)
                       }).FirstOrDefault();
 
@@ -87,7 +87,7 @@ namespace KMC.API.Controllers
                             e.Capacity,
                             e.ImageUrl,
                             OrganizerName = u.FullName,
-                            // The count has been added here!
+                            
                             RegisteredCount = _context.Registrations.Count(r => r.EventId == e.EventId)
                         };
 
@@ -119,14 +119,14 @@ namespace KMC.API.Controllers
                                 e.Capacity,
                                 e.ImageUrl,
                                 OrganizerName = u.FullName,
-                                // The count has been added here!
+                                
                                 RegisteredCount = _context.Registrations.Count(r => r.EventId == e.EventId)
                             }).ToList();
 
             return Ok(myEvents);
         }
 
-        // NEW: Gets the specific Guest List for an Organizer
+        
         [HttpGet("{eventId}/attendees")]
         [Authorize]
         public IActionResult GetEventAttendees(int eventId)

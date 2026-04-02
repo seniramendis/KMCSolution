@@ -50,7 +50,7 @@ namespace KMC.API.Controllers
         [Authorize]
         public async Task<IActionResult> GetMyRegistrations()
         {
-            // FIX: Changed ClaimTypes.NameIdentifier to "id" so it finds you!
+            
             var userId = int.Parse(User.FindFirst("id")?.Value ?? "0");
             if (userId == 0) return Unauthorized("Invalid user ID.");
 
@@ -77,7 +77,7 @@ namespace KMC.API.Controllers
         [Authorize]
         public async Task<IActionResult> CancelRegistration(int eventId)
         {
-            // FIX: Changed ClaimTypes.NameIdentifier to "id"
+            
             var userId = int.Parse(User.FindFirst("id")?.Value ?? "0");
             if (userId == 0) return Unauthorized("Invalid user ID.");
 

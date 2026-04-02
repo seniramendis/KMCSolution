@@ -20,7 +20,7 @@ namespace KMC.Client.Controllers
             _env = env;
         }
 
-        // --- PUBLIC VIEWS ---
+        
         public async Task<IActionResult> Details(int id)
         {
             var ev = await _api.GetEventAsync(id);
@@ -28,7 +28,7 @@ namespace KMC.Client.Controllers
             return View(ev);
         }
 
-        // --- ORGANIZER VIEWS ---
+        
         public IActionResult Create()
         {
             if (HttpContext.Session.GetString("Role") != "Organizer") return RedirectToAction("Login", "Auth");
@@ -142,7 +142,7 @@ namespace KMC.Client.Controllers
             return View(events);
         }
 
-        // THIS IS THE METHOD WE ADDED!
+        
         public async Task<IActionResult> Attendees(int id)
         {
             if (HttpContext.Session.GetString("Role") != "Organizer") return RedirectToAction("Login", "Auth");
@@ -153,7 +153,7 @@ namespace KMC.Client.Controllers
             return View(list);
         }
 
-        // --- ATTENDEE VIEWS ---
+        
         [HttpPost]
         public async Task<IActionResult> Register(int id)
         {
